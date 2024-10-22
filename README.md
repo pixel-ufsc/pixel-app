@@ -18,7 +18,7 @@ This project is a mobile application developed for the exclusive use of our Juni
   cd pixel-app
 ```
 
-2. Install dependencies 
+2. Install dependencies s
 <br/>
 
     Frontend
