@@ -1,10 +1,7 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable no-undef */
 /* eslint-disable @typescript-eslint/no-require-imports */
-/* eslint-disable react/prop-types */
 import React from 'react';
-import { View, Text, Image, StyleSheet } from 'react-native';
-import { Button } from 'react-native-paper';
+import { View, Text, Image, StyleSheet, TouchableOpacity } from 'react-native';
 import { router } from 'expo-router';
 
 const Welcome = () => {
@@ -21,19 +18,16 @@ const Welcome = () => {
         resizeMode='contain'
       />
       <Text style={styles.title}>Pixel App</Text>
-      <Text style={styles.description}>
-        O aplicativo exclusivo da Pixel para você acompanhar as últimas
-        novidades e conectar-se com a nossa comunidade.
-      </Text>
-      <Button
-        mode='contained'
-        onPress={handleGoogleLogin}
-        icon='google'
-        style={styles.loginButton}
-        labelStyle={styles.loginButtonLabel}
-      >
-        Entrar com Google
-      </Button>
+      <Text style={styles.description}>O seu companheiro da Pixel.</Text>
+      <TouchableOpacity style={styles.googleButton} onPress={handleGoogleLogin}>
+        <View style={styles.googleIconContainer}>
+          <Image
+            source={require('../assets/images/google-icon.png')}
+            style={styles.googleIcon}
+          />
+        </View>
+        <Text style={styles.googleButtonText}>Entrar com o Google</Text>
+      </TouchableOpacity>
     </View>
   );
 };
@@ -64,13 +58,35 @@ const styles = StyleSheet.create({
     marginBottom: 30,
     paddingHorizontal: 20,
   },
-  loginButton: {
+  googleButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#fff',
+    borderRadius: 5,
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 2,
+    elevation: 3,
     width: '80%',
-    backgroundColor: '#4285F4',
   },
-  loginButtonLabel: {
-    color: '#fff',
+  googleIconContainer: {
+    width: 30,
+    height: 30,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 20,
+  },
+  googleIcon: {
+    width: 40,
+    height: 40,
+  },
+  googleButtonText: {
     fontSize: 16,
+    fontWeight: '500',
+    color: '#333',
   },
 });
 
