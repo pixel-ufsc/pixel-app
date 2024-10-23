@@ -21,7 +21,7 @@ This project is a mobile application developed for the exclusive use of our Juni
 2. Install dependencies s
 <br/>
 
-    Frontend
+Frontend
 
     ```bash
     cd frontend
@@ -29,7 +29,7 @@ This project is a mobile application developed for the exclusive use of our Juni
     npx expo start
     ```
 
-    Backend
+Backend
 
 
     ```bash
