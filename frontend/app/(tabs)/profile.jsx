@@ -1,5 +1,6 @@
 import React from 'react';
 import { View, Text, StyleSheet, Image } from 'react-native';
+import profileImage from '../../assets/images/profile.png';
 
 export default function Profile() {
   let logado = true;
@@ -10,16 +11,31 @@ export default function Profile() {
   }
 }
 
-const ownProfile = () => {
-  return (
-      <View style={styles.container}>
+const avatar = () => {
+    return (
         <Image
-          source={require('../../assets/images/profile.png')}
-          style={styles.photo}
-          resizeMode='countain'
+            source={profileImage}
+            style={[styles.photo, { borderRadius: 75 }, {marginBottom: 10}]}
+            resizeMode='contain'
         />
-      </View>
-  )
+    );
+}
+
+const profile = () => {
+    return(
+        <View style={styles.container}>
+            {avatar()}
+            <Text style={styles.title}>Apelido do usuário</Text>
+            <Text style={styles.subtitle}> @conta</Text>
+            <Text> Bio muito dahora tipo você não tem noção</Text>
+        </View>
+    )
+}
+
+const ownProfile = () => {
+    return (
+        profile()
+    )
 }
 
 const otherProfile = () => {
