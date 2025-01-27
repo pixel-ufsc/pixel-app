@@ -32,7 +32,7 @@ export default function AuthTabsLayout() {
     },
     {
       key: 'profile',
-      title: 'Profile',
+      title: 'Perfil',
       focusedIcon: 'account-circle',
       unfocusedIcon: 'account-circle-outline',
     },
