@@ -18,14 +18,11 @@ This project is a mobile application developed for the exclusive use of our Juni
   cd pixel-app
 ```
 
-2. Install dependencies s
-<br/>
-
-Frontend
+2. Install dependenciess
 
 ```
-cd frontend
-npm install
-npx expo start
+  cd frontend
+  npm install
+  npx expo start
 ```
 
