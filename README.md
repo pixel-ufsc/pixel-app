@@ -23,9 +23,9 @@ This project is a mobile application developed for the exclusive use of our Juni
 
 Frontend
 
-    ```
-    cd frontend
-    npm install
-    npx expo start
-    ```
+```
+cd frontend
+npm install
+npx expo start
+```
 
