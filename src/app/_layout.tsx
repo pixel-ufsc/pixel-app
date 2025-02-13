@@ -1,27 +1,32 @@
 // arquivo de entrada da aplicacao
-
 import { router, Slot } from 'expo-router';
 import { ClerkProvider, useAuth } from '@clerk/clerk-expo';
-import { useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { ActivityIndicator } from 'react-native';
 import { tokenCache } from '@/storage/tokenCache';
-import { AppRegistry } from 'react-native';
 import { DefaultTheme, PaperProvider } from 'react-native-paper';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const PUBLIC_CLERK_PUBLISHABLE_KEY = process.env
   .EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY as string;
 
 function InitialLayout() {
-  const { isSignedIn, isLoaded } = useAuth();
+  const { isSignedIn, isLoaded, getToken } = useAuth();
 
   useEffect(() => {
-    console.log('aaaa isSignedIn', isSignedIn);
+    const fetchToken = async (): Promise<void> => {
+      const token = await getToken({template: "supabase"})
+      if (token) {
+        await AsyncStorage.setItem("sessionToken", token)
+      }
+    }
 
     if (!isLoaded) {
       return;
     }
     if (isSignedIn) {
       console.log('to logado vou pra oi mundo');
+      fetchToken();
       router.replace('./(auth)');
     } else {
       console.log('isSignedIn', isSignedIn);
