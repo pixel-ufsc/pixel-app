@@ -22,7 +22,7 @@ export default function Home() {
   useEffect(() => {
     const fetchUserData = async () => {
       try {
-        const response = await ApiClient.get("/medias", auth);
+        const response = await ApiClient.get("/medias/?limit=20", auth);
         setData(response.data);
 
         console.log("data", response);
