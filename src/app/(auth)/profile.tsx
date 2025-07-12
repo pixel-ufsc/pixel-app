@@ -1,5 +1,6 @@
 import { View, Text, StyleSheet, Image, TouchableOpacity, TextInput, ScrollView, ActivityIndicator } from 'react-native';
-import { Menu, IconButton, Button } from 'react-native-paper';
+import { Menu, Button } from 'react-native-paper';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useState, useEffect } from 'react';
 import * as ImagePicker from 'expo-image-picker';
 import { useAuth } from '@clerk/clerk-expo';
@@ -126,13 +127,12 @@ export default function Profile() {
                 visible={menuVisible}
                 onDismiss={() => setMenuVisible(false)}
                 anchor={
-                  <IconButton
-                    icon="menu"
-                    size={24}
+                  <TouchableOpacity
                     onPress={() => setMenuVisible(true)}
                     style={styles.menuButton}
-                    iconColor="#693274"
-                  />
+                  >
+                    <MaterialCommunityIcons name="menu" size={24} color="#693274" />
+                  </TouchableOpacity>
                 }
                 contentStyle={styles.menuContent}
               >
@@ -183,7 +183,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#fafafa',
-    padding: 16,
+    padding: 20,
   },
   profileHeader: {
     flexDirection: 'row',
@@ -218,6 +218,7 @@ const styles = StyleSheet.create({
   profileInfo: {
     flex: 1,
     justifyContent: 'center',
+    
   },
   profileName: {
     fontSize: 20,
@@ -291,8 +292,10 @@ const styles = StyleSheet.create({
     zIndex: 1000,
   },
   menuButton: {
-    margin: 0,
-    padding: 0,
+    width: 24,
+    height: 24,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   saveButton: {
     position: 'absolute',

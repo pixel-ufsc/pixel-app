@@ -1,8 +1,7 @@
 import { StyleSheet } from "react-native";
 
 export const styles = StyleSheet.create({
-    card: {
-      width: '90%',
+    card: {      
       alignSelf: 'center',
       backgroundColor: '#fff',
       borderRadius: 10,
