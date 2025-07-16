@@ -14,12 +14,14 @@ interface MediaModalProps {
   visible: boolean;
   media: Media | null;
   onClose: () => void;
+  onComment?: () => void;
 }
 
 export default function MediaModal({
   visible,
   media,
   onClose,
+  onComment,
 }: MediaModalProps) {
   if (!media) return null;
 
@@ -89,7 +91,7 @@ export default function MediaModal({
               <Text style={styles.footerActionText}>149</Text>
             </Pressable>
             <Pressable
-              onPress={() => console.log("Comentário")}
+              onPress={onComment}
               style={styles.footerActionContainer}
             >
               <Image

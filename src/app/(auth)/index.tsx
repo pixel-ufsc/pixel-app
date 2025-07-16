@@ -4,6 +4,7 @@ import ApiClient from "@/utils/api";
 import { useAuth } from "@clerk/clerk-expo";
 import { useEffect, useState } from "react";
 import { FlatList, Pressable, StyleSheet, View } from "react-native";
+import CommentModal from "@/components/CommentModal";
 
 interface Media {
   _id: string;
@@ -16,8 +17,11 @@ export default function Home() {
   const [data, setData] = useState<Media[]>([]);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [selectedMedia, setSelectedMedia] = useState<Media | null>(null);
-
+  const [showComments, setShowComments] = useState(false);
+  const [selectedPostId, setSelectedPostId] = useState<string | null>(null);
+  
   const auth = useAuth();
+  
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -45,6 +49,16 @@ export default function Home() {
     setIsModalVisible(false);
   };
 
+  const handleOpenComment = (postId: string) => {
+    setSelectedPostId(postId);
+    setShowComments(true);
+  };
+
+  const handleCloseComments = () => {
+    setShowComments(false);
+    setSelectedPostId(null);
+  };
+
   useEffect(() => {
     console.log("selectedMedia", selectedMedia);
     console.log("isModalVisible", isModalVisible);
@@ -64,6 +78,7 @@ export default function Home() {
                   description={item.description}
                   url={item.url}
                   createdAt={item.createdAt}
+                  onComment={() => handleOpenComment(item._id)}
                 />
               </Pressable>
             </View>
@@ -74,6 +89,15 @@ export default function Home() {
         visible={isModalVisible}
         media={selectedMedia}
         onClose={closemodal}
+        onComment={() => {
+          if (selectedMedia) handleOpenComment(selectedMedia._id);
+        }}
+      />
+      <CommentModal
+        visible={showComments}
+        onClose={handleCloseComments}
+        postId={selectedPostId || ""}
+        auth={auth}
       />
     </>
   );
