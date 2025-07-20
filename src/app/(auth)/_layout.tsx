@@ -34,6 +34,7 @@ const TABS = [
   {
     key: "profile",
     title: "Perfil",
+
     route: "profile",
     focusedIcon: require("../../../assets/images/profile-icon.png"),
     unfocusedIcon: require("../../../assets/images/profile-icon-outline.png"),
@@ -49,7 +50,6 @@ export default function AuthTabsLayout() {
       <View style={{ flex: 1 }}>
         <Slot />
       </View>
-
       <View
         style={{
           flexDirection: "row",
