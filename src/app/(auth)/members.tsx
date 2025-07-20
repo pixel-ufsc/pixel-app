@@ -126,13 +126,12 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#fff',
-    paddingTop: 40,
+    padding: 20,
   },
   header: {
     alignItems: 'flex-start',
     width: '100%',
-    paddingHorizontal: 16,
-    paddingBottom: 16,
+    
   },
   titulo: {
     fontSize: 24,
