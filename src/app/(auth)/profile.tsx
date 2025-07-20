@@ -1,20 +1,35 @@
-import { View, Text, StyleSheet, Image, TouchableOpacity, TextInput } from 'react-native';
-import { Button } from 'react-native-paper';
+import { View, Text, StyleSheet, Image, TouchableOpacity, TextInput, ScrollView, ActivityIndicator } from 'react-native';
+import { Menu, IconButton, Button } from 'react-native-paper';
+import { useState, useEffect } from 'react';
+import * as ImagePicker from 'expo-image-picker';
 import { useAuth } from '@clerk/clerk-expo';
-import { useState } from 'react';
-import * as ImagePicker from 'expo-image-picker'; 
+import { useLocalSearchParams } from 'expo-router';
 
-export default function Profile({ isOwnProfile = true }) {
+interface User {
+  _id: string;
+  name: string;
+  email: string;
+  role: string;
+  course: string;
+  memberSince: string;
+  image: string;
+  bio: string;
+}
+
+export default function Profile() {
   const { signOut } = useAuth();
+  const { id } = useLocalSearchParams();
+  const isOwnProfile = !id;
 
+  const [loading, setLoading] = useState(true);
+  const [cargo, setCargo] = useState('');
   const [editando, setEditando] = useState(false);
-  const [nome, setNome] = useState('Joana da Silva');
-  const [email, setEmail] = useState('gabriel@pixel.com');
-  const [memberSince, setMemberSince] = useState('2024/2');
-  const [fotoUrl, setFotoUrl] = useState('https://images.unsplash.com/photo-1634130287199-7889bc37f7fe?q=80&w=1964&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D');
-  const [bio, setBio] = useState('Alguma bio sobre mim');
+  const [menuVisible, setMenuVisible] = useState(false);
+  const [nome, setNome] = useState('');
+  const [memberSince, setMemberSince] = useState('');
+  const [fotoUrl, setFotoUrl] = useState('');
+  const [bio, setBio] = useState('');
 
-  // Array de imagens mock para os posts
   const mockPosts = [
     'https://images.unsplash.com/photo-1506744038136-46273834b3fb',
     'https://images.unsplash.com/photo-1465101046530-73398c7f28ca',
@@ -25,6 +40,26 @@ export default function Profile({ isOwnProfile = true }) {
   ];
 
   const postsCount = mockPosts.length;
+
+  useEffect(() => {
+    const mockUser: User = {
+      _id: '123',
+      name: 'Gabriel Souza',
+      email: 'gabriel@exemplo.com',
+      role: 'Desenvolvedor',
+      course: 'Sistemas de Informação',
+      memberSince: '2023/1',
+      image: 'https://images.unsplash.com/photo-1634130287199-7889bc37f7fe',
+      bio: 'Alguma bio sobre mim.',
+    };
+
+    setNome(mockUser.name);
+    setCargo(mockUser.role);
+    setMemberSince(mockUser.memberSince);
+    setFotoUrl(mockUser.image);
+    setBio(mockUser.bio);
+    setLoading(false);
+  }, []);
 
   async function pickImage() {
     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
@@ -43,8 +78,16 @@ export default function Profile({ isOwnProfile = true }) {
     }
   }
 
+  if (loading) {
+    return (
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator size="large" color="#693274" />
+      </View>
+    );
+  }
+
   return (
-    <View style={styles.container}>
+    <ScrollView contentContainerStyle={styles.container}>
       <View style={styles.profileHeader}>
         <View style={styles.profileImageWrapper}>
           <Image source={{ uri: fotoUrl }} style={styles.profileImage} />
@@ -62,17 +105,60 @@ export default function Profile({ isOwnProfile = true }) {
               onChangeText={setNome}
             />
           ) : (
-            <Text style={styles.profileName}>{nome}</Text>
+            <View>
+              <Text style={styles.profileName}>{nome}</Text>
+            </View>
           )}
-          <Text style={styles.profileMember}>Membro desde {memberSince}</Text>
+          <Text style={styles.profileMember}>{cargo} | Membro desde {memberSince}</Text>
           <Text style={styles.profilePosts}>{postsCount} posts</Text>
         </View>
         {isOwnProfile && (
-          <TouchableOpacity style={styles.editButton} onPress={() => setEditando(!editando)}>
-            <Text style={styles.editButtonText}>{editando ? 'Salvar' : 'Editar'}</Text>
-          </TouchableOpacity>
+          editando ? (
+            <TouchableOpacity
+              style={styles.saveButton}
+              onPress={() => setEditando(false)}
+            >
+              <Text style={styles.saveButtonText}>Salvar</Text>
+            </TouchableOpacity>
+          ) : (
+            <View style={styles.menuContainer}>
+              <Menu
+                visible={menuVisible}
+                onDismiss={() => setMenuVisible(false)}
+                anchor={
+                  <IconButton
+                    icon="menu"
+                    size={24}
+                    onPress={() => setMenuVisible(true)}
+                    style={styles.menuButton}
+                    iconColor="#693274"
+                  />
+                }
+                contentStyle={styles.menuContent}
+              >
+                <Menu.Item
+                  onPress={() => {
+                    setEditando(true);
+                    setMenuVisible(false);
+                  }}
+                  title="Editar"
+                  leadingIcon="pencil"
+                  titleStyle={styles.menuItemText}
+                  style={styles.menuItem}
+                />
+                <Menu.Item                  
+                  title="Sair"
+                  leadingIcon="logout"
+                  onPress={() => signOut()}
+                  titleStyle={styles.menuItemText}
+                  style={styles.menuItem}
+                />
+              </Menu>
+            </View>
+          )
         )}
       </View>
+
       {editando && isOwnProfile ? (
         <TextInput
           style={styles.profileBioInput}
@@ -83,22 +169,13 @@ export default function Profile({ isOwnProfile = true }) {
       ) : (
         <Text style={styles.profileBio}>{bio}</Text>
       )}
+
       <View style={styles.postsGrid}>
         {mockPosts.map((img, i) => (
           <Image key={i} source={{ uri: img }} style={styles.postItemImage} />
         ))}
-      </View>
-      {isOwnProfile && (
-        <Button
-          icon="logout"
-          mode="contained"
-          onPress={() => signOut()}
-          style={{ marginTop: 32, backgroundColor: '#693274' }}
-        >
-          Sair
-        </Button>
-      )}
-    </View>
+      </View>      
+    </ScrollView>
   );
 }
 
@@ -201,17 +278,55 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-start',
     marginTop: 8,
   },
-  postItem: {
-    width: '33.33%',
-    aspectRatio: 1,
-    backgroundColor: '#dadada',
-    borderWidth: 0.2,
-    borderColor: '#888',
-  },
   postItemImage: {
     width: '33.33%',
     aspectRatio: 1,
     borderWidth: 0.2,
     borderColor: '#ccc',
+  },
+  menuContainer: {
+    position: 'absolute',
+    top: 0,
+    right: 0,
+    zIndex: 1000,
+  },
+  menuButton: {
+    margin: 0,
+    padding: 0,
+  },
+  saveButton: {
+    position: 'absolute',
+    top: 0,
+    right: 0,
+    paddingVertical: 6,
+    paddingHorizontal: 12,
+    borderRadius: 8,
+    backgroundColor: '#693274',
+  },
+  saveButtonText: {
+    color: '#fff',
+    fontWeight: 'bold',
+    fontSize: 16,
+  },
+  menuContent: {
+    backgroundColor: '#fff',
+    borderRadius: 8,
+    elevation: 4,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+  },
+  menuItem: {
+    paddingVertical: 8,
+  },
+  menuItemText: {
+    color: '#693274',
+    fontSize: 16,
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 });

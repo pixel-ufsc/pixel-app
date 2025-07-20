@@ -39,7 +39,7 @@ class ApiClient {
       body: JSON.stringify(body),
     });
   }
-
+}
 
 const api = new ApiClient();
 
