@@ -1,9 +1,9 @@
-import {View, Text, FlatList, StyleSheet } from "react-native";
 import ApiClient from "@/utils/api";
-import { useState } from "react";
-import NotificationCard from "../../components/NotificationCard";
-import MediaModal from "../../components/MediaModal";
 import { useAuth } from "@clerk/clerk-expo";
+import { useState } from "react";
+import { FlatList, StyleSheet, Text, View } from "react-native";
+import MediaModal from "../../components/MediaModal";
+import NotificationCard from "../../components/NotificationCard";
 
 const mockNotifications = [
   {
@@ -11,7 +11,8 @@ const mockNotifications = [
     nome: "João Silva",
     acao: "curtiu",
     tempo: "5 minutos",
-    imagem: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MXx8cHJvZmlsZSUyMHBpY3xlbnwwfHwwfHx8Mg%3D%3D",
+    imagem:
+      "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MXx8cHJvZmlsZSUyMHBpY3xlbnwwfHwwfHx8Mg%3D%3D",
     postId: "681807b2cb80d2493b39a115",
   },
   {
@@ -19,7 +20,8 @@ const mockNotifications = [
     nome: "Maria Souza",
     acao: "comentou",
     tempo: "10 minutos",
-    imagem: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MXx8cHJvZmlsZSUyMHBpY3xlbnwwfHwwfHx8Mg%3D%3D",
+    imagem:
+      "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MXx8cHJvZmlsZSUyMHBpY3xlbnwwfHwwfHx8Mg%3D%3D",
     postId: "681807b2cb80d2493b39a115",
   },
   {
@@ -27,7 +29,8 @@ const mockNotifications = [
     nome: "Carlos Lima",
     acao: "cometou",
     tempo: "20 minutos",
-    imagem: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MXx8cHJvZmlsZSUyMHBpY3xlbnwwfHwwfHx8Mg%3D%3D",
+    imagem:
+      "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MXx8cHJvZmlsZSUyMHBpY3xlbnwwfHwwfHx8Mg%3D%3D",
     postId: "681807b2cb80d2493b39a115",
   },
   {
@@ -35,11 +38,11 @@ const mockNotifications = [
     nome: "Ana Paula",
     acao: "curtiu",
     tempo: "30 minutos",
-    imagem: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MXx8cHJvZmlsZSUyMHBpY3xlbnwwfHwwfHx8Mg%3D%3D",
+    imagem:
+      "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MXx8cHJvZmlsZSUyMHBpY3xlbnwwfHwwfHx8Mg%3D%3D",
     postId: "681807b2cb80d2493b39a115",
   },
 ];
-
 
 interface Media {
   _id: string;
@@ -53,7 +56,7 @@ const fetchMediaById = async (postId: string, auth: any) => {
     const response = await ApiClient.get(`/medias/${postId}`, auth);
     return response;
   } catch (error) {
-    console.error('Erro ao buscar media:', error);
+    console.error("Erro ao buscar media:", error);
     return null;
   }
 };
@@ -64,9 +67,9 @@ export default function Notifications() {
   const auth = useAuth();
 
   const handleOpenPost = async (postId: string) => {
-    console.log('handleOpenPost chamado com postId:', postId);
+    console.log("handleOpenPost chamado com postId:", postId);
     const media = await fetchMediaById(postId, auth);
-    console.log('media retornada:', media);
+    console.log("media retornada:", media);
     setSelectedMedia(media);
     setModalVisible(true);
   };
@@ -76,7 +79,7 @@ export default function Notifications() {
       <Text style={styles.titulo}>Notificações</Text>
       <FlatList
         data={mockNotifications}
-        keyExtractor={(item) => item.postId}
+        keyExtractor={item => item.postId}
         renderItem={({ item }) => (
           <NotificationCard
             id={item.id}
@@ -98,13 +101,11 @@ export default function Notifications() {
   );
 }
 
-
 const styles = StyleSheet.create({
-titulo: {
-  fontSize: 24,
-  paddingBottom: 4,
-  fontWeight: 'bold',
-  color: '#693274',
-}
-
-})
+  titulo: {
+    fontSize: 24,
+    paddingBottom: 4,
+    fontWeight: "bold",
+    color: "#693274",
+  },
+});
