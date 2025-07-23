@@ -7,6 +7,7 @@ interface FeedCardProps {
   description: string;
   url: string;
   createdAt: Date;
+  onComment?: () => void;
 }
 
 function getRandomName(): string {
@@ -32,7 +33,7 @@ function getRandomRole(): string {
   return roles[randomIndex];
 }
 
-const FeedCard: React.FC<FeedCardProps> = ({ description, url, createdAt }) => {
+const FeedCard: React.FC<FeedCardProps> = ({ description, url, createdAt, onComment }) => {
   const userRole = getRandomRole();
   const userName = getRandomName();
   const mediaDate = new Date(createdAt);
@@ -86,7 +87,7 @@ const FeedCard: React.FC<FeedCardProps> = ({ description, url, createdAt }) => {
             </View>
           </Pressable>
           <Pressable
-            onPress={() => console.log("Comentário")}
+            onPress={onComment}
             style={styles.footerActionContainer}
           >
             <Image
