@@ -17,12 +17,13 @@ import { Menu } from "react-native-paper";
 
 interface User {
   _id: string;
-  name: string;
+  first_name: string;
+  last_name: string;
   email: string;
   role: string;
   course: string;
   memberSince: string;
-  image: string;
+  profileImageUrl: string;
   bio: string;
 }
 
@@ -35,7 +36,8 @@ export default function Profile() {
   const [cargo, setCargo] = useState("");
   const [editando, setEditando] = useState(false);
   const [menuVisible, setMenuVisible] = useState(false);
-  const [nome, setNome] = useState("");
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
   const [memberSince, setMemberSince] = useState("");
   const [fotoUrl, setFotoUrl] = useState("");
   const [bio, setBio] = useState("");
@@ -54,19 +56,21 @@ export default function Profile() {
   useEffect(() => {
     const mockUser: User = {
       _id: "123",
-      name: "Gabriel Souza",
+      first_name: "Gabriel",
+      last_name: "Pereira",
       email: "gabriel@exemplo.com",
       role: "Desenvolvedor",
       course: "Sistemas de Informação",
       memberSince: "2023/1",
-      image: "https://images.unsplash.com/photo-1634130287199-7889bc37f7fe",
+      profileImageUrl: "https://images.unsplash.com/photo-1634130287199-7889bc37f7fe",
       bio: "Alguma bio sobre mim.",
     };
 
-    setNome(mockUser.name);
+    setFirstName(mockUser.first_name);
+    setLastName(mockUser.last_name);
     setCargo(mockUser.role);
     setMemberSince(mockUser.memberSince);
-    setFotoUrl(mockUser.image);
+    setFotoUrl(mockUser.profileImageUrl);
     setBio(mockUser.bio);
     setLoading(false);
   }, []);
@@ -118,14 +122,21 @@ export default function Profile() {
         </View>
         <View style={styles.profileInfo}>
           {editando ? (
-            <TextInput
-              style={styles.profileNameInput}
-              value={nome}
-              onChangeText={setNome}
-            />
+            <>
+              <TextInput
+                style={styles.profileNameInput}
+                value={firstName}
+                onChangeText={setFirstName}
+              />
+              <TextInput
+                style={styles.profileNameInput}
+                value={lastName}
+                onChangeText={setLastName}
+              />
+            </>
           ) : (
             <View>
-              <Text style={styles.profileName}>{nome}</Text>
+              <Text style={styles.profileName}>{`${firstName} ${lastName}`}</Text>
             </View>
           )}
           <Text style={styles.profileMember}>
