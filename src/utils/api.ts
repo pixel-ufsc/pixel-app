@@ -33,7 +33,8 @@ class ApiClient {
     return this.request<T>(path, auth, { method: "GET" });
   }
 
-  public post<T = any>(path: string, body: any, auth: Auth) {
+
+  public post<T = any>(path: string, auth: Auth, body: any) {
     return this.request<T>(path, auth, {
       method: "POST",
       body: JSON.stringify(body),
