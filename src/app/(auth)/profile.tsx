@@ -1,3 +1,4 @@
+import api from "@/utils/api";
 import { useAuth } from "@clerk/clerk-expo";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import * as ImagePicker from "expo-image-picker";
@@ -27,53 +28,112 @@ interface User {
   bio: string;
 }
 
+interface Media {
+  _id: string;
+  description: string;
+  url: string;
+  createdAt: Date;
+}
+
+interface MediaResponse {
+  data: Media[];
+}
+
 export default function Profile() {
-  const { signOut } = useAuth();
+  const { getToken, signOut } = useAuth();
   const { id } = useLocalSearchParams();
-  const isOwnProfile = !id;
 
   const [loading, setLoading] = useState(true);
   const [cargo, setCargo] = useState("");
   const [editando, setEditando] = useState(false);
   const [menuVisible, setMenuVisible] = useState(false);
+  const [isOwnProfile, setIsOwnProfile] = useState(!id);
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [memberSince, setMemberSince] = useState("");
   const [fotoUrl, setFotoUrl] = useState("");
   const [bio, setBio] = useState("");
+  const [posts, setPosts] = useState<string[]>([]);
+  const [userData, setUserData] = useState<User | null>(null);
 
-  const mockPosts = [
-    "https://images.unsplash.com/photo-1506744038136-46273834b3fb",
-    "https://images.unsplash.com/photo-1465101046530-73398c7f28ca",
-    "https://images.unsplash.com/photo-1519125323398-675f0ddb6308",
-    "https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e",
-    "https://images.unsplash.com/photo-1519985176271-adb1088fa94c",
-    "https://images.unsplash.com/photo-1438761681033-6461ffad8d80",
-  ];
+  const postsCount = posts.length;
 
-  const postsCount = mockPosts.length;
+  const handleUserUpdate = async () => {
+    try {
+      setLoading(true);
+      if (userData == null) throw TypeError;
+      await api.put(
+        `/users/${userData._id}`,
+        { getToken },
+        {
+          first_name: firstName,
+          last_name: lastName,
+          profileImageUrl: fotoUrl,
+          bio: bio,
+        },
+      );
+    } catch (error) {
+      console.error("Erro ao atualizar o usuário:", error);
+    } finally {
+      setLoading(false);
+      setEditando(false);
+    }
+  };
 
   useEffect(() => {
-    const mockUser: User = {
-      _id: "123",
-      first_name: "Gabriel",
-      last_name: "Pereira",
-      email: "gabriel@exemplo.com",
-      role: "Desenvolvedor",
-      course: "Sistemas de Informação",
-      memberSince: "2023/1",
-      profileImageUrl: "https://images.unsplash.com/photo-1634130287199-7889bc37f7fe",
-      bio: "Alguma bio sobre mim.",
+    const fetchUser = async () => {
+      const uri = id ? id : "me";
+      console.log(id);
+      try {
+        const response = await api.get<User>(`/users/${uri}`, { getToken });
+        setUserData(response);
+      } catch (error) {
+        console.error("Erro ao pedir dados do usuário:", error);
+      } finally {
+        setLoading(false);
+      }
     };
 
-    setFirstName(mockUser.first_name);
-    setLastName(mockUser.last_name);
-    setCargo(mockUser.role);
-    setMemberSince(mockUser.memberSince);
-    setFotoUrl(mockUser.profileImageUrl);
-    setBio(mockUser.bio);
-    setLoading(false);
+    fetchUser();
   }, []);
+
+  useEffect(() => {
+    if (userData) {
+      const fetchPosts = async () => {
+        try {
+          const userPosts = await api.get<MediaResponse>(
+            `/medias/user/${userData._id}`,
+            {
+              getToken,
+            },
+          );
+          setPosts(userPosts.data.map((post: Media) => post.url));
+        } catch (error) {
+          console.error("Erro ao pedir mídias do usuário:", error);
+        }
+      };
+
+      const checkOwnProfile = async () => {
+        // Checa se o perfil é o mesmo do usuário autenticado quando o perfil é acessado na página de membros
+        if (id) {
+          const ownUserResponse = await api.get<User>("/users/me", {
+            getToken,
+          });
+          setIsOwnProfile(userData._id === ownUserResponse._id);
+        }
+      };
+
+      checkOwnProfile();
+      fetchPosts();
+      setFirstName(userData.first_name);
+      setLastName(userData.last_name);
+      setCargo(userData.role);
+      setMemberSince(userData.memberSince);
+      setFotoUrl(userData.profileImageUrl);
+      setBio(userData.bio);
+    }
+    console.log(isOwnProfile);
+  }, [userData]);
 
   async function pickImage() {
     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
@@ -136,7 +196,9 @@ export default function Profile() {
             </>
           ) : (
             <View>
-              <Text style={styles.profileName}>{`${firstName} ${lastName}`}</Text>
+              <Text
+                style={styles.profileName}
+              >{`${firstName} ${lastName}`}</Text>
             </View>
           )}
           <Text style={styles.profileMember}>
@@ -148,7 +210,7 @@ export default function Profile() {
           (editando ? (
             <TouchableOpacity
               style={styles.saveButton}
-              onPress={() => setEditando(false)}
+              onPress={handleUserUpdate}
             >
               <Text style={styles.saveButtonText}>Salvar</Text>
             </TouchableOpacity>
@@ -205,7 +267,7 @@ export default function Profile() {
       )}
 
       <View style={styles.postsGrid}>
-        {mockPosts.map((img, i) => (
+        {posts.map((img, i) => (
           <Image
             key={i}
             source={{ uri: img }}
