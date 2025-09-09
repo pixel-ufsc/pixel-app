@@ -11,7 +11,7 @@ import {
 } from "react-native";
 import { TextInput } from "react-native-paper";
 import React, { useState } from "react";
-import { useAuth } from "@clerk/clerk-react";
+import { useAuth } from "@clerk/clerk-expo";
 import AntDesign from '@expo/vector-icons/AntDesign';
 import { Picker } from "@react-native-picker/picker";
 
