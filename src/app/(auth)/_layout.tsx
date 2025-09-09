@@ -39,6 +39,14 @@ const TABS = [
     focusedIcon: require("../../../assets/images/profile-icon.png"),
     unfocusedIcon: require("../../../assets/images/profile-icon-outline.png"),
   },
+  {
+    key: "register",
+    title: "Register",
+
+    route: "register",
+    focusedIcon: require("../../../assets/images/profile-icon.png"),
+    unfocusedIcon: require("../../../assets/images/profile-icon-outline.png"),
+  },
 ] as const;
 
 export default function AuthTabsLayout() {
