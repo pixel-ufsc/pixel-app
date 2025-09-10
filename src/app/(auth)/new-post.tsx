@@ -81,12 +81,13 @@ export default function NewPostScreen() {
 
         await ApiClient.post(
           "/medias",
+          auth,
           {
             title: "Teste",
             description: caption,
             url: data.secure_url,
           },
-          auth,
+          
         );
 
         if (data.secure_url) {

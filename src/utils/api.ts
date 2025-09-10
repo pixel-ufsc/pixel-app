@@ -11,7 +11,6 @@ class ApiClient {
     options: RequestInit = {},
   ): Promise<T> {
     const token = await auth.getToken();
-    console.log(token);
     const response = await fetch(`${this.baseUrl}${path}`, {
       ...options,
       headers: {

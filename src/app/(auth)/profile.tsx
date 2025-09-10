@@ -58,6 +58,18 @@ export default function Profile() {
 
   const postsCount = posts.length;
 
+   useEffect(() => {
+    async function logTokenLongo() {
+      try {
+        const token = await getToken({ template: "supabase" });
+        console.log("Token longo:", token);
+      } catch (err) {
+        console.error("Erro ao buscar token longo:", err);
+      }
+    }
+    logTokenLongo();
+  }, [getToken]);
+
   const handleUserUpdate = async () => {
     try {
       setLoading(true);
