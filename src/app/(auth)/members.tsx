@@ -46,7 +46,8 @@ export default function Members() {
 
       setMembers(formattedMembers);
       setError(null);
-    } catch (error) {
+    } 
+    catch (error) {
       setError(error instanceof Error ? error.message : 'Erro ao carregar membros');
     } finally {
       setLoading(false);

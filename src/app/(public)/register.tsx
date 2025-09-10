@@ -5,13 +5,16 @@ import {
   Text,
   TouchableOpacity,
   View,
+  NativeSyntheticEvent, TextInputChangeEventData,
+  Dimensions,
+  ScrollView,
 } from "react-native";
 import { TextInput } from "react-native-paper";
 import React, { useState } from "react";
-import { useAuth } from "@clerk/clerk-react";
+import { useAuth } from "@clerk/clerk-expo";
 import AntDesign from '@expo/vector-icons/AntDesign';
-import { NativeSyntheticEvent, TextInputChangeEventData } from "react-native";
 import { Picker } from "@react-native-picker/picker";
+
 
 function RegisterPage(){
     const [nameVerify,setNameVerify] = useState(false);
@@ -26,6 +29,7 @@ function RegisterPage(){
     const [role, setRole] = useState(""); 
     const { getToken, isLoaded, userId } = useAuth();
     const [selectedOption, setSelectedOption] = useState<string>(""); //picker
+    const windowHeight = Dimensions.get('window').height * 0.08;
 
     function handleName(e : NativeSyntheticEvent<TextInputChangeEventData>){
       const nameVar = e.nativeEvent.text
@@ -108,11 +112,13 @@ function RegisterPage(){
   }
 }
   return(
+    <ScrollView style={{ flex: 1, backgroundColor: "#f0f0f0" }}>
     <View  style={styles.userContainer} >
+      <View  style={styles.Background} >
       <ImageBackground source = {require("../../../assets/images/register-bg.png")} resizeMode="repeat" style = {styles.Img}></ImageBackground>
-      <Image source = {require("../../../assets/images/register-user-logo.png")} style = {styles.userIcon}></Image>
-      <View style = {styles.registerInputHolder}>
-        <Text style = {styles.userWelcome}>Bem vindo(a) ao PixelApp</Text>
+      <Image source = {require("../../../assets/images/register-user-logo.png")} style = {styles.userIcon}></Image></View>
+      <View style = {styles.LabelRegister}> 
+        <Text style = {[styles.userWelcome , { marginTop:windowHeight}]}>Bem vindo(a) ao PixelApp</Text>
         <View style = {styles.TextInputHolder}>
         <TextInput 
           underlineColor="transparent"
@@ -147,19 +153,19 @@ function RegisterPage(){
             onChangeText={setMemberSince}
           />
       <View>
-        <Picker
-          selectedValue={selectedOption}
-          style={styles.CargoDropdown}
-          onValueChange={(itemValue) => setSelectedOption(itemValue)}
-        >
-          <Picker.Item label="Cargo na Pixel" value="" />
-          <Picker.Item label="Trainee" value="op1" />
-          <Picker.Item label="Efetivo" value="op2" />
-          <Picker.Item label="Diretor de Projetos" value="op4" />
-          <Picker.Item label="Diretor de Marketing" value="op5" />
-          <Picker.Item label="Diretor de DH" value="op6" />
-          <Picker.Item label="Diretor de Comercial" value="op7" />
-          <Picker.Item label="Presidente" value="op8" />
+         <Picker
+        selectedValue={role}
+        style={styles.CargoDropdown}
+        onValueChange={(itemValue) => setRole(itemValue)}
+      >
+        <Picker.Item label="Cargo na Pixel" value="Cargo na Pixel" />
+        <Picker.Item label="Trainee" value="Trainee" />
+        <Picker.Item label="Efetivo" value="Efetivo" />
+        <Picker.Item label="Diretor de Projetos" value="Diretor de Projetos" />
+        <Picker.Item label="Diretor de Marketing" value="Diretor de Marketing" />
+        <Picker.Item label="Diretor de DH" value="Diretor de DH" />
+        <Picker.Item label="Diretor de Comercial" value="Diretor de Comercial" />
+        <Picker.Item label="Presidente" value="Presidente" />
         </Picker>
       </View>
           <View style = {styles.TextInputHolder}>
@@ -174,6 +180,7 @@ function RegisterPage(){
           />
           {email.trim().length < 1 ? null : emailVerify ? (<AntDesign style = {styles.Icon} name="check" size={20} color="black" />) : (<AntDesign style = {styles.Icon} name="close" size={20} color="black"/>)}
           </View>
+         
             <TextInput 
             underlineColor="transparent"
              activeUnderlineColor="transparent"
@@ -189,8 +196,8 @@ function RegisterPage(){
           <Text style={styles.ButtonText}>Registrar</Text>
         </TouchableOpacity>
         </View>
-      
-    </View>
+      </View>
+      </ScrollView>
   )
 }
 
@@ -201,54 +208,63 @@ const styles = StyleSheet.create({
     width: 100,
     height: 100,
     borderRadius: 35,
-    position: "absolute",
-    alignSelf:"center",
-    top:60,
+    position: "relative",
+    top:50,
     zIndex:10,
+
   },
-  userContainer: {
-    flex:1,
+  Background:{
+    alignItems: "center",
+    justifyContent:"center",
+    height:170,
   },
   LabelRegister:{
     boxSizing: "border-box",
     alignItems: "center",
-    justifyContent: "flex-end",
+    justifyContent: "center",
+    flex:6,
+  },
+  userContainer:{
+    flex:1,
   },
   Img:{
       width: "100%",
+      height:170,
       flex:1,
   },
   userWelcome: {
     fontSize: 20,
     fontWeight: "bold",
     color: "#693274",
-    marginBottom:25,
+    marginBottom:5,
   },
   CargoDropdown:{
     width:300,
-    height:45,
-    marginBottom:19,
+    height:50,
     backgroundColor: "#D9D9D9",
     borderTopLeftRadius: 25,
     borderTopRightRadius: 25,
     borderBottomLeftRadius: 25,
     borderBottomRightRadius: 25,
-    
+    borderWidth: 0,
+    color : "#464444ff",
+    paddingLeft:10,
+    marginBottom:10,
   },
   registerInput:{
     width:300,
     backgroundColor: "#D9D9D9",
-    marginBottom:19,
     borderTopLeftRadius: 25,
     borderTopRightRadius: 25,
     borderBottomLeftRadius: 25,
     borderBottomRightRadius: 25,
+    marginBottom:15,
   },
   registerInputHolder:{
     alignItems: "center",
-    justifyContent:"center",
+    justifyContent:"flex-start",
     backgroundColor: "white",
-    flex:5,
+   
   },
   Icon : {
     position: 'absolute',
