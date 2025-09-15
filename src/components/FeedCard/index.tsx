@@ -37,7 +37,9 @@ const FeedCard: React.FC<FeedCardProps> = ({ description, url, createdAt, totalL
           <View style={styles.userThumbnail}>
             <Image
               style={styles.userImage}
-              source={{ uri: author.profileImageUrl }}
+              source={author.profileImageUrl
+                      ? { uri: author.profileImageUrl }
+                      : require('../../../assets/images/register-user-logo.png')}
             />
           </View>
           <View style={styles.headerDescription}>

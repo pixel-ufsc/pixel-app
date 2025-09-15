@@ -21,10 +21,8 @@ function InitialLayout() {
       return;
     }
     if (isSignedIn) {
-      console.log('to logado vou pra oi mundo');
       router.replace('./(auth)');
     } else {
-      console.log('isSignedIn', isSignedIn);
       router.replace('./(public)');
     }
   }, [isSignedIn]);

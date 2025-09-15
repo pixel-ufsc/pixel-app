@@ -57,7 +57,6 @@ export default function Home() {
         );
 
         const authors = await Promise.all(authorPromises);
-        console.log("Dados do primeiro autor:", authors[0]);
         const combinedData = postsOnly.map((post: PostResponse, index:number) => {
           return {
             ...post, 

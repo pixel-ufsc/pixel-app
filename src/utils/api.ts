@@ -11,7 +11,6 @@ class ApiClient {
     options: RequestInit = {},
   ): Promise<T> {
     const token = await auth.getToken();
-    console.log(token);
     const response = await fetch(`${this.baseUrl}${path}`, {
       ...options,
       headers: {
@@ -33,10 +32,16 @@ class ApiClient {
     return this.request<T>(path, auth, { method: "GET" });
   }
 
-
   public post<T = any>(path: string, auth: Auth, body: any) {
     return this.request<T>(path, auth, {
       method: "POST",
+      body: JSON.stringify(body),
+    });
+  }
+
+  public put<T = any>(path: string, auth: Auth, body: any) {
+    return this.request<T>(path, auth, {
+      method: "PUT",
       body: JSON.stringify(body),
     });
   }
