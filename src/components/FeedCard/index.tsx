@@ -7,35 +7,18 @@ interface FeedCardProps {
   description: string;
   url: string;
   createdAt: Date;
+  author : {
+      first_name: string,
+      last_name: string,     
+      role: string,
+      profileImageUrl: string,
+    };
+  totalLikes:number;
+  totalComments: number;
   onComment?: () => void;
 }
 
-function getRandomName(): string {
-  const names = [
-    "Lucas Lima",
-    "João Silva",
-    "Maria Oliveira",
-    "Ana Santos",
-    "Pedro Costa",
-  ];
-  const randomIndex = Math.floor(Math.random() * names.length);
-  return names[randomIndex];
-}
-
-function getRandomRole(): string {
-  const roles = [
-    "Desenvolvedor",
-    "Designer",
-    "Gerente de Projetos",
-    "Diretor de Engenharia de Software",
-  ];
-  const randomIndex = Math.floor(Math.random() * roles.length);
-  return roles[randomIndex];
-}
-
-const FeedCard: React.FC<FeedCardProps> = ({ description, url, createdAt, onComment }) => {
-  const userRole = getRandomRole();
-  const userName = getRandomName();
+const FeedCard: React.FC<FeedCardProps> = ({ description, url, createdAt, totalLikes, totalComments, author, onComment }) => {
   const mediaDate = new Date(createdAt);
   const currentDate = new Date();
   let date;
@@ -52,11 +35,14 @@ const FeedCard: React.FC<FeedCardProps> = ({ description, url, createdAt, onComm
       <View style={styles.header}>
         <View style={styles.topDescription}>
           <View style={styles.userThumbnail}>
-            <View style={styles.userImage}></View>
+            <Image
+              style={styles.userImage}
+              source={{ uri: author.profileImageUrl }}
+            />
           </View>
           <View style={styles.headerDescription}>
-            <Text style={styles.userName}>{userName}</Text>
-            <Text style={styles.userRole}>{userRole}</Text>
+            <Text style={styles.userName}>{author.first_name} {author.last_name}</Text>
+            <Text style={styles.userRole}>{author.role}</Text>
             <Text style={styles.date}>{date}</Text>
           </View>
         </View>
@@ -69,9 +55,9 @@ const FeedCard: React.FC<FeedCardProps> = ({ description, url, createdAt, onComm
       <View style={styles.footer}>
         <View style={styles.cardStats}>
           <View>
-            <Text style={styles.statsText}>XYZ 149</Text>
+            <Text style={styles.statsText}>{totalLikes}</Text>
           </View>
-          <Text style={styles.statsText}>100 comentários</Text>
+          <Text style={styles.statsText}>{totalComments}</Text>
         </View>
         <View style={styles.footerActions}>
           <Pressable

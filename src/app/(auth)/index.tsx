@@ -1,16 +1,39 @@
+import CommentModal from "@/components/CommentModal";
 import FeedCard from "@/components/FeedCard";
 import MediaModal from "@/components/MediaModal";
 import ApiClient from "@/utils/api";
 import { useAuth } from "@clerk/clerk-expo";
 import { useEffect, useState } from "react";
 import { FlatList, Pressable, StyleSheet, View } from "react-native";
-import CommentModal from "@/components/CommentModal";
+
+interface Author {
+  _id: string;
+  first_name: string;
+  last_name: string;         
+  role: string;
+  profileImageUrl: string;
+}
+
+interface PostResponse {
+  _id: string;
+  description: string;
+  url: string;
+  createdAt: Date;
+  totalLikes: number;
+  totalComments: number;
+  author: { // no começo autor é apenas um objeto com id
+    _id: string;
+  };
+}
 
 interface Media {
   _id: string;
   description: string;
   url: string;
   createdAt: Date;
+  totalLikes: number;
+  totalComments: number;
+  author: Author;
 }
 
 export default function Home() {
@@ -24,18 +47,32 @@ export default function Home() {
   
 
   useEffect(() => {
-    const fetchUserData = async () => {
+    const fetchFeedData = async () => {
       try {
         const response = await ApiClient.get("/medias/?limit=20", auth);
-        setData(response.data);
+        const postsOnly = response.data;
 
-        console.log("data", response);
+        const authorPromises = postsOnly.map((post: PostResponse) =>
+          ApiClient.get(`/users/${post.author._id}`, auth) 
+        );
+
+        const authors = await Promise.all(authorPromises);
+        console.log("Dados do primeiro autor:", authors[0]);
+        const combinedData = postsOnly.map((post: PostResponse, index:number) => {
+          return {
+            ...post, 
+            author: authors[index]
+          };
+        });
+
+        setData(combinedData);
+
       } catch (error) {
-        console.error("Erro ao buscar usuários:", error);
+        console.error("Erro ao buscar dados do feed:", error);
       }
     };
 
-    fetchUserData();
+    fetchFeedData();
   }, []);
 
   const selectMedia = (media: Media) => {
@@ -78,6 +115,9 @@ export default function Home() {
                   description={item.description}
                   url={item.url}
                   createdAt={item.createdAt}
+                  totalLikes={item.totalLikes}
+                  totalComments={item.totalComments}
+                  author={item.author}
                   onComment={() => handleOpenComment(item._id)}
                 />
               </Pressable>
