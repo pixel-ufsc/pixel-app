@@ -58,7 +58,7 @@ export default function Profile() {
 
   const postsCount = posts.length;
 
-   useEffect(() => {
+  useEffect(() => {
     async function logTokenLongo() {
       try {
         const token = await getToken({ template: "supabase" });
