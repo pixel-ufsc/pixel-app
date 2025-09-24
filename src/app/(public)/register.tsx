@@ -89,7 +89,7 @@ function RegisterPage(){
       role : role, 
       memberSince : memberSince,
     }
-    const response = await fetch("http://192.168.1.13:3040/users", {
+    const response = await fetch("http://localhost:3040/users", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
