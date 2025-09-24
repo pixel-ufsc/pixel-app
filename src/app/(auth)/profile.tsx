@@ -1,3 +1,5 @@
+import CommentModal from "@/components/CommentModal";
+import MediaModal from "@/components/MediaModal";
 import api from "@/utils/api";
 import { useAuth } from "@clerk/clerk-expo";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
@@ -6,7 +8,9 @@ import { useLocalSearchParams } from "expo-router";
 import { useEffect, useState } from "react";
 import {
   ActivityIndicator,
+  FlatList,
   Image,
+  Pressable,
   ScrollView,
   StyleSheet,
   Text,
@@ -40,6 +44,7 @@ interface MediaResponse {
 }
 
 export default function Profile() {
+  const auth = useAuth();
   const { getToken, signOut } = useAuth();
   const { id } = useLocalSearchParams();
 
@@ -53,8 +58,12 @@ export default function Profile() {
   const [memberSince, setMemberSince] = useState("");
   const [fotoUrl, setFotoUrl] = useState("");
   const [bio, setBio] = useState("");
-  const [posts, setPosts] = useState<string[]>([]);
+  const [posts, setPosts] = useState<Media[]>([]);
   const [userData, setUserData] = useState<User | null>(null);
+  const [selectedMedia, setSelectedMedia] = useState<Media | null>();
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [selectedPostId, setSelectedPostId] = useState<string>("");
+  const [showComments, setShowComments] = useState(false);
 
   const postsCount = posts.length;
 
@@ -92,6 +101,26 @@ export default function Profile() {
     }
   };
 
+  const handleSelectMedia = (media: Media) => {
+    setSelectedMedia(media);
+    setIsModalVisible(true);
+  };
+
+  const handleCloseModal = () => {
+    setSelectedMedia(null);
+    setIsModalVisible(false);
+  };
+
+  const handleOpenComment = (postId: string) => {
+    setSelectedPostId(postId);
+    setShowComments(true);
+  };
+
+  const handleCloseComments = () => {
+    setShowComments(false);
+    setSelectedPostId("");
+  };
+
   useEffect(() => {
     const fetchUser = async () => {
       const uri = id ? id : "me";
@@ -119,7 +148,7 @@ export default function Profile() {
               getToken,
             },
           );
-          setPosts(userPosts.data.map((post: Media) => post.url));
+          setPosts(userPosts.data);
         } catch (error) {
           console.error("Erro ao pedir mídias do usuário:", error);
         }
@@ -279,15 +308,38 @@ export default function Profile() {
       )}
 
       <View style={styles.postsGrid}>
-        {posts.map((img, i) => (
-          <Image
-            key={i}
-            source={{ uri: img }}
-            style={styles.postItemImage}
-            resizeMode="cover"
-          />
-        ))}
+        <FlatList
+          data={posts}
+          numColumns={3}
+          keyExtractor={item => item._id.toString()}
+          renderItem={({ item }) => (
+            <Pressable
+              onPress={() => handleSelectMedia(item)}
+              style={styles.postItem}
+            >
+              <Image
+                source={{ uri: item.url }}
+                style={styles.postItemImage}
+                resizeMode="cover"
+              />
+            </Pressable>
+          )}
+        />
       </View>
+      <MediaModal
+        visible={isModalVisible}
+        media={selectedMedia || null}
+        onClose={handleCloseModal}
+        onComment={() => {
+          if (selectedMedia) handleOpenComment(selectedMedia._id);
+        }}
+      />
+      <CommentModal
+        visible={showComments}
+        onClose={handleCloseComments}
+        postId={selectedPostId || ""}
+        auth={auth}
+      />
     </ScrollView>
   );
 }
@@ -391,8 +443,11 @@ const styles = StyleSheet.create({
     justifyContent: "flex-start",
     marginTop: 8,
   },
-  postItemImage: {
+  postItem: {
     width: "33.33%",
+  },
+  postItemImage: {
+    width: "100%",
     aspectRatio: 1,
     borderWidth: 0.2,
     borderColor: "#ccc",
