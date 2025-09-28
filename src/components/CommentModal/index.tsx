@@ -1,15 +1,17 @@
-import React, { useEffect, useState } from 'react';
-import { styles } from './style';
-import { Modal, View, Text, TextInput, Button, FlatList, TouchableOpacity, Touchable } from 'react-native';
 import api from '@/utils/api';
 import { useAuth } from '@clerk/clerk-expo';
 import { Ionicons } from '@expo/vector-icons';
+import React, { useEffect, useState } from 'react';
+import { FlatList, Modal, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { styles } from './style';
 
 interface Comment {
   _id: string;
   mediaId: string;
   content: string;
   author: {
+    first_name: string;
+    last_name: string;
     _id: string;
     _links: {
       self: {
@@ -67,7 +69,7 @@ const CommentModal: React.FC<CommentModalProps> = ({ visible, onClose, postId, a
       console.error('Erro ao adicionar comentário:', error);
     }
   };
-
+console.log(comments);
   return (
     <Modal visible={visible} animationType="slide" onRequestClose={onClose} transparent>
       <View style={styles.overlay}>
@@ -85,7 +87,7 @@ const CommentModal: React.FC<CommentModalProps> = ({ visible, onClose, postId, a
               keyExtractor={(item) => item._id}
               renderItem={({ item }) => (
                 <View style={styles.comment}>
-                  <Text style={styles.author}>Usuário {item.author._id}</Text>
+                  <Text style={styles.author}>{item.author["first_name"]} {item.author["last_name"]}</Text>
                   <Text>{item.content}</Text>
                 </View>
               )}

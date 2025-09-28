@@ -8,6 +8,14 @@ interface Media {
   description: string;
   url: string;
   createdAt: Date;
+  totalLikes:number;
+  totalComments: number;
+  author : {
+    first_name: string,
+    last_name: string,     
+    role: string,
+    profileImageUrl: string,
+  };
 }
 
 interface MediaModalProps {
@@ -72,8 +80,8 @@ export default function MediaModal({
             >
               <View style={styles.userImage}></View>
               <View>
-                <Text style={styles.userName}>Eduardo Delduqui</Text>
-                <Text style={styles.userRole}>Software Engineer</Text>
+                <Text style={styles.userName}>{media.author.first_name} {media.author.last_name}</Text>
+                <Text style={styles.userRole}>{media.author.role}</Text>
               </View>
             </View>
             <Text style={styles.mediaDescription}>{media.description}</Text>
@@ -88,7 +96,7 @@ export default function MediaModal({
                 style={styles.footerIcon}
                 source={require("../../../assets/images/thumb_up-white.png")}
               />
-              <Text style={styles.footerActionText}>149</Text>
+              <Text style={styles.footerActionText}>{media.totalLikes}</Text>
             </Pressable>
             <Pressable
               onPress={onComment}
@@ -98,7 +106,7 @@ export default function MediaModal({
                 style={styles.footerIcon}
                 source={require("../../../assets/images/comment-white.png")}
               />
-              <Text style={styles.footerActionText}>100</Text>
+              <Text style={styles.footerActionText}>{media.totalComments}</Text>
             </Pressable>
             <Pressable
               onPress={() => console.log("Compartilhamento")}
