@@ -5,17 +5,16 @@ export default function formatDate(date1: Date, date2: Date) {
 
   const diffYears = date2.getFullYear() - date1.getFullYear();
   const diffMonths = diffYears * 12 + (date2.getMonth() - date1.getMonth());
+  const diffMs = date2.getTime() - date1.getTime();
+  const diffMinutes = Math.floor(diffMs / (1000 * 60));
 
   if (diffMonths >= 12) {
     return `${Math.floor(diffMonths / 12)}y`;
   }
 
-  if (diffMonths >= 1) {
+  if (diffMonths >= 1 && diffMinutes / 1440 >= 30) {
     return `${diffMonths}mo`;
   }
-
-  const diffMs = date2.getTime() - date1.getTime();
-  const diffMinutes = Math.floor(diffMs / (1000 * 60));
 
   if (diffMinutes >= 1440) {
     return `${Math.floor(diffMinutes / 1440)}d`;
