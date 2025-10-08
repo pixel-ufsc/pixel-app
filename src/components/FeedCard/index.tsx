@@ -4,21 +4,24 @@ import { Image, Pressable, Text, View } from "react-native";
 import { styles } from "./style";
 
 interface FeedCardProps {
+  id: string;
+  isLiked: boolean;
   description: string;
   url: string;
   createdAt: Date;
-  author : {
-      first_name: string,
-      last_name: string,     
-      role: string,
-      profileImageUrl: string,
-    };
-  totalLikes:number;
+  author: {
+    first_name: string,
+    last_name: string,
+    role: string,
+    profileImageUrl: string,
+  };
+  totalLikes: number;
   totalComments: number;
   onComment?: () => void;
+  onLike: () => void;
 }
 
-const FeedCard: React.FC<FeedCardProps> = ({ description, url, createdAt, totalLikes, totalComments, author, onComment }) => {
+const FeedCard: React.FC<FeedCardProps> = ({ id, isLiked, description, url, createdAt, totalLikes, totalComments, author, onLike, onComment }) => {
   const mediaDate = new Date(createdAt);
   const currentDate = new Date();
   let date;
@@ -38,8 +41,8 @@ const FeedCard: React.FC<FeedCardProps> = ({ description, url, createdAt, totalL
             <Image
               style={styles.userImage}
               source={author.profileImageUrl
-                      ? { uri: author.profileImageUrl }
-                      : require('../../../assets/images/register-user-logo.png')}
+                ? { uri: author.profileImageUrl }
+                : require('../../../assets/images/register-user-logo.png')}
             />
           </View>
           <View style={styles.headerDescription}>
@@ -63,7 +66,7 @@ const FeedCard: React.FC<FeedCardProps> = ({ description, url, createdAt, totalL
         </View>
         <View style={styles.footerActions}>
           <Pressable
-            onPress={() => console.log("Like!")}
+            onPress={onLike}
             style={styles.footerActionContainer}
           >
             <Image
@@ -71,7 +74,7 @@ const FeedCard: React.FC<FeedCardProps> = ({ description, url, createdAt, totalL
               source={require("../../../assets/images/thumb_up-icon.png")}
             />
             <View>
-              <Text style={styles.footerActionText}>Gostei</Text>
+              <Text style={[styles.footerActionText, { color: isLiked ? '#693274' : '#000000b3' }]}>Gostei</Text>
             </View>
           </Pressable>
           <Pressable
