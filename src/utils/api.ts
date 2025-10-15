@@ -19,6 +19,9 @@ class ApiClient {
         "Content-Type": "application/json",
       },
     });
+    if (response.status === 204) {
+      return undefined as T;
+    }
 
     if (!response.ok) {
       const error = await response.text();
@@ -44,6 +47,10 @@ class ApiClient {
       method: "PUT",
       body: JSON.stringify(body),
     });
+  }
+
+  public delete<T = any>(path: string, auth: Auth) {
+    return this.request<T>(path, auth, { method: "DELETE" });
   }
 }
 
