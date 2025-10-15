@@ -71,10 +71,10 @@ const FeedCard: React.FC<FeedCardProps> = ({ id, isLiked, description, url, crea
           >
             <Image
               style={styles.footerIcon}
-              source={require("../../../assets/images/thumb_up-icon.png")}
+              source={isLiked ? require("../../../assets/images/thumb_up_full-icon.png") : require("../../../assets/images/thumb_up-icon.png")}
             />
             <View>
-              <Text style={[styles.footerActionText, { color: isLiked ? '#693274' : '#000000b3' }]}>Gostei</Text>
+              <Text style={[styles.footerActionText, { color: isLiked ? '#490471ff' : '#000000b3' }]}>Gostei</Text>
             </View>
           </Pressable>
           <Pressable
