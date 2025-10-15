@@ -17,11 +17,11 @@
       "supportsTablet": true
     },
     "android": {
-      "package": "com.pixel.pixelapp",
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "package": "com.pixel.pixelapp"
     },
     "web": {
       "bundler": "metro",
