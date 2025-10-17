@@ -45,40 +45,70 @@ export default function Home() {
   const [showComments, setShowComments] = useState(false);
   const [selectedPostId, setSelectedPostId] = useState<string | null>(null);
 
+  // Página atual do feed, usado para fazer o scroll infinito
+  const [page, setPage] = useState(1);
+
+  // Flag para evitar carregar mais de uma vez ao mesmo tempo
+  const [loadingMore, setLoadingMore] = useState(false);
+
   const auth = useAuth();
 
+  const fetchFeedData = async (pageNum = 1) => {
+    try {
+      // Faz a requisicao de posts paginados
+      const response = await ApiClient.get<{ data: PostResponse[] }>(`/medias/?limit=10&page=${pageNum}`, auth);
+      const postsOnly: PostResponse[] = response.data;
 
-  useEffect(() => {
-    const fetchFeedData = async () => {
-      try {
-        const response = await ApiClient.get<{ data: PostResponse[] }>("/medias/?limit=20", auth);
-        const postsOnly: PostResponse[] = response.data;
+      // Busca os dados de cada autor
+      const authorPromises = postsOnly.map((post: PostResponse) =>
+        ApiClient.get<Author>(`/users/${post.author._id}`, auth)
+      );
 
-        const authorPromises = postsOnly.map((post: PostResponse) =>
-          ApiClient.get<Author>(`/users/${post.author._id}`, auth)
-        );
+      // Espera todas as requisicoes terminarem
+      const authors: Author[] = await Promise.all(authorPromises);
 
-        const authors: Author[] = await Promise.all(authorPromises);
+      // Combina cada post com seu autor
+      const combinedData: Media[] = postsOnly.map((post, index) => {
+        return {
+          ...post,
+          author: authors[index],
+          isLiked: post.isLiked || false,
+        };
+      });
 
-        const combinedData: Media[] = postsOnly.map((post, index) => {
-          return {
-            ...post,
-            author: authors[index],
-            isLiked: post.isLiked || false,
-          };
-        });
-
-        setData(combinedData);
-
-      } catch (error) {
-        console.error("Erro ao buscar dados do feed:", error);
+      //setData(combinedData);
+      // Atualiza o estado
+    setData((prevData) => {
+      if (pageNum === 1) { // Se a página esta sendo carregada pela primeira vez
+        return combinedData;
+      } else { // Se não só carrega mais posts
+        return [...prevData, ...combinedData]; //...postsAntigos + ...postsNovos
       }
-    };
+    });
 
-    if (auth.isLoaded) {
-      fetchFeedData();
+    } catch (error) {
+      console.error("Erro ao buscar dados do feed:", error);
     }
-  }, [auth.userId]);
+  };
+
+  // Carrega a primeira página quando o componente monta
+  useEffect(() => {
+    if (auth.isLoaded) {
+      fetchFeedData(1);
+    }
+  }, [auth.isLoaded]);
+
+  const loadMore = async () => {
+  if (loadingMore) {
+    return;
+  } 
+  console.log("Carregando mais posts...");
+  setLoadingMore(true);
+  const nextPage = page + 1;
+  await fetchFeedData(nextPage);
+  setPage(nextPage);
+  setLoadingMore(false);
+  };
 
   const handleLike = async (postId: string) => {
     const postOriginal = data.find(p => p._id === postId);
@@ -140,6 +170,8 @@ export default function Home() {
           style={styles.feed}
           data={data}
           keyExtractor={item => item._id.toString()}
+          onEndReached={loadMore} // scroll infinito
+          onEndReachedThreshold={0.5} // scroll infinito
           renderItem={({ item }) => (
             <View style={styles.teste}>
               <Pressable onPress={() => selectMedia(item)}>
