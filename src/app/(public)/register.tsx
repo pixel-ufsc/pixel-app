@@ -1,19 +1,20 @@
-import {
-  Image,
-  ImageBackground,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-  NativeSyntheticEvent, TextInputChangeEventData,
-  Dimensions,
-  ScrollView,
-} from "react-native";
-import { TextInput } from "react-native-paper";
-import React, { useState } from "react";
 import { useAuth } from "@clerk/clerk-expo";
 import AntDesign from '@expo/vector-icons/AntDesign';
 import { Picker } from "@react-native-picker/picker";
+import React, { useState } from "react";
+import {
+  Dimensions,
+  Image,
+  ImageBackground,
+  NativeSyntheticEvent,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInputChangeEventData,
+  TouchableOpacity,
+  View,
+} from "react-native";
+import { TextInput } from "react-native-paper";
 
 
 function RegisterPage(){
@@ -35,7 +36,6 @@ function RegisterPage(){
       const nameVar = e.nativeEvent.text
       setFirstName(nameVar)
        const isValid = !/[^a-zA-ZÀ-ÿ\s]/.test(nameVar);
-      console.log(nameVar, isValid , nameVerify);
       if(nameVar.trim().length > 1 && isValid) { // testa se tem uma e se é somente letra{
         setNameVerify(true); //cuidado aqui
       }
@@ -48,7 +48,6 @@ function RegisterPage(){
       const LastNameVar = e.nativeEvent.text
       setLastName(LastNameVar)
       const isValid = !/[^a-zA-ZÀ-ÿ\s]/.test(LastNameVar);
-      console.log(LastNameVar, isValid);
       if(LastNameVar.trim().length > 1 && isValid) { // testa se tem uma e se é somente letra{
         setLastNameVerify(true); //cuidado aqui
       }
@@ -61,7 +60,6 @@ function RegisterPage(){
       const EmailVar = e.nativeEvent.text
       setEmail(EmailVar)
       const isValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(EmailVar);
-      console.log(EmailVar, isValid);
       if(EmailVar.trim().length > 1 && isValid) { // testa se tem uma e se é somente letra{
         setEmailVerify(true); //cuidado aqui
       }
@@ -106,7 +104,6 @@ function RegisterPage(){
     }
 
     const result = await response.json();
-    console.log("Usuário cadastrado:", result);
   } catch (error) {
     console.error(error);
   }

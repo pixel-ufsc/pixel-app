@@ -69,7 +69,6 @@ const CommentModal: React.FC<CommentModalProps> = ({ visible, onClose, postId, a
       console.error('Erro ao adicionar comentário:', error);
     }
   };
-console.log(comments);
   return (
     <Modal visible={visible} animationType="slide" onRequestClose={onClose} transparent>
       <View style={styles.overlay}>

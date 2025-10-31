@@ -102,7 +102,6 @@ export default function Home() {
   if (loadingMore) {
     return;
   } 
-  console.log("Carregando mais posts...");
   setLoadingMore(true);
   const nextPage = page + 1;
   await fetchFeedData(nextPage);
@@ -143,7 +142,6 @@ export default function Home() {
   };
 
   const closemodal = () => {
-    console.log("closemodal");
     setSelectedMedia(null);
     setIsModalVisible(false);
   };
@@ -159,8 +157,6 @@ export default function Home() {
   };
 
   useEffect(() => {
-    console.log("selectedMedia", selectedMedia);
-    console.log("isModalVisible", isModalVisible);
   }, [selectedMedia, isModalVisible]);
 
   return (

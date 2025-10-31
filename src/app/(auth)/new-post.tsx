@@ -91,7 +91,6 @@ export default function NewPostScreen() {
         );
 
         if (data.secure_url) {
-          console.log("Postagem criada!", `URL da imagem:\n${data.secure_url}`);
           router.back();
         } else {
           console.log(

@@ -108,15 +108,6 @@ export default function MediaModal({
               />
               <Text style={styles.footerActionText}>{media.totalComments}</Text>
             </Pressable>
-            <Pressable
-              onPress={() => console.log("Compartilhamento")}
-              style={styles.footerActionContainer}
-            >
-              <Image
-                style={styles.footerIcon}
-                source={require("../../../assets/images/send-white.png")}
-              />
-            </Pressable>
           </View>
         </View>
       </Modal>
