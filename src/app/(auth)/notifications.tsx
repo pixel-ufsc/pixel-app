@@ -67,9 +67,7 @@ export default function Notifications() {
   const auth = useAuth();
 
   const handleOpenPost = async (postId: string) => {
-    console.log("handleOpenPost chamado com postId:", postId);
     const media = await fetchMediaById(postId, auth);
-    console.log("media retornada:", media);
     setSelectedMedia(media);
     setModalVisible(true);
   };

@@ -71,7 +71,6 @@ export default function Profile() {
     async function logTokenLongo() {
       try {
         const token = await getToken({ template: "supabase" });
-        console.log("Token longo:", token);
       } catch (err) {
         console.error("Erro ao buscar token longo:", err);
       }
@@ -124,7 +123,6 @@ export default function Profile() {
   useEffect(() => {
     const fetchUser = async () => {
       const uri = id ? id : "me";
-      console.log(id);
       try {
         const response = await api.get<User>(`/users/${uri}`, { getToken });
         setUserData(response);
@@ -173,7 +171,6 @@ export default function Profile() {
       setFotoUrl(userData.profileImageUrl);
       setBio(userData.bio);
     }
-    console.log(isOwnProfile);
   }, [userData]);
 
   async function pickImage() {
