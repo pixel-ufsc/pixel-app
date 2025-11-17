@@ -1,9 +1,14 @@
+import Constants from "expo-constants";
+
 interface Auth {
   getToken: () => Promise<string | null>;
 }
 
 class ApiClient {
-  private baseUrl: string = process.env.API_BASE_URI || "http://localhost:3040";
+  private baseUrl: string =
+    process.env.API_BASE_URI ||
+    Constants.expoConfig?.extra?.API_BASE_URI ||
+    "http://localhost:3040";
 
   private async request<T = any>(
     path: string,

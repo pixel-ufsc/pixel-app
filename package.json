@@ -4,8 +4,8 @@
   "version": "1.0.0",
   "scripts": {
     "start": "expo start",
-    "android": "expo start --android",
-    "ios": "expo start --ios",
+    "android": "expo run:android",
+    "ios": "expo run:ios",
     "web": "expo start --web",
     "test": "jest --watchAll"
   },
@@ -15,10 +15,15 @@
   "dependencies": {
     "@clerk/clerk-expo": "^2.6.15",
     "@expo/vector-icons": "~14.0.4",
+    "@react-native-firebase/app": "^23.5.0",
+    "@react-native-firebase/messaging": "^23.5.0",
     "@react-native-picker/picker": "2.9.0",
     "@react-navigation/native": "^7.0.14",
     "expo": "~52.0.47",
+    "expo-auth-session": "~6.0.3",
+    "expo-constants": "~17.0.8",
     "expo-crypto": "~14.0.2",
+    "expo-dev-client": "~5.0.20",
     "expo-font": "~13.0.3",
     "expo-image-picker": "~16.0.6",
     "expo-linear-gradient": "~14.0.2",
@@ -37,7 +42,8 @@
     "react-native-safe-area-context": "4.12.0",
     "react-native-screens": "~4.4.0",
     "react-native-vector-icons": "^10.2.0",
-    "react-native-web": "~0.19.13"
+    "react-native-web": "~0.19.13",
+    "expo-build-properties": "~0.13.3"
   },
   "devDependencies": {
     "@babel/core": "^7.25.2",

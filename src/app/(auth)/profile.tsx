@@ -60,7 +60,7 @@ export default function Profile() {
   const [bio, setBio] = useState("");
   const [posts, setPosts] = useState<Media[]>([]);
   const [userData, setUserData] = useState<User | null>(null);
-  const [selectedMedia, setSelectedMedia] = useState<Media | null>();
+  const [selectedMedia, setSelectedMedia] = useState<Media | null>(null);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [selectedPostId, setSelectedPostId] = useState<string>("");
   const [showComments, setShowComments] = useState(false);

@@ -1,12 +1,14 @@
-import { router, Slot, usePathname } from 'expo-router';
-import { ClerkProvider, useAuth } from '@clerk/clerk-expo';
-import { useEffect } from 'react';
-import { ActivityIndicator } from 'react-native';
-import { tokenCache } from '@/storage/tokenCache';
-import { DefaultTheme, PaperProvider } from 'react-native-paper';
+import { tokenCache } from "@/storage/tokenCache";
+import { ClerkProvider, useAuth } from "@clerk/clerk-expo";
+import Constants from "expo-constants";
+import { router, Slot, usePathname } from "expo-router";
+import { useEffect } from "react";
+import { ActivityIndicator } from "react-native";
+import { DefaultTheme, PaperProvider } from "react-native-paper";
 
-const PUBLIC_CLERK_PUBLISHABLE_KEY = process.env
-  .EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY as string;
+const PUBLIC_CLERK_PUBLISHABLE_KEY =
+  (process.env.EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY as string) ||
+  (Constants.expoConfig?.extra?.EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY as string);
 
 function InitialLayout() {
   const { isSignedIn, isLoaded } = useAuth();
@@ -15,11 +17,11 @@ function InitialLayout() {
   useEffect(() => {
     if (!isLoaded) return;
     // Só redireciona se estiver na raiz
-    if (pathname === '/') {
+    if (pathname === "/") {
       if (isSignedIn) {
-        router.replace('./(auth)');
+        router.replace("./(auth)");
       } else {
-        router.replace('./(public)');
+        router.replace("./(public)");
       }
     }
   }, [isSignedIn, isLoaded, pathname]);
@@ -28,7 +30,7 @@ function InitialLayout() {
     <Slot />
   ) : (
     <ActivityIndicator
-      style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}
+      style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
     />
   );
 }
@@ -37,7 +39,7 @@ const theme = {
   ...DefaultTheme,
   colors: {
     ...DefaultTheme.colors,
-    primary: '#6200ee',
+    primary: "#6200ee",
   },
 };
 

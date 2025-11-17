@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "456979330933",
+    "project_id": "pixel-app-5de3e",
+    "storage_bucket": "pixel-app-5de3e.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:456979330933:android:2a28ddc638389c394f853c",
+        "android_client_info": {
+          "package_name": "com.pixel.pixelapp"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBGrhV3I7dzkiE3fCMWXElZuIFUzDejzkw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
