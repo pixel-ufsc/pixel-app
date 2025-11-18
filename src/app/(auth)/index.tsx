@@ -9,13 +9,14 @@ import { FlatList, Pressable, StyleSheet, View } from "react-native";
 interface Author {
   _id: string;
   first_name: string;
-  last_name: string;         
+  last_name: string;
   role: string;
   profileImageUrl: string;
 }
 
 interface PostResponse {
   _id: string;
+  isLiked?: boolean;
   description: string;
   url: string;
   createdAt: Date;
@@ -28,6 +29,7 @@ interface PostResponse {
 
 interface Media {
   _id: string;
+  isLiked?: boolean;
   description: string;
   url: string;
   createdAt: Date;
@@ -42,37 +44,98 @@ export default function Home() {
   const [selectedMedia, setSelectedMedia] = useState<Media | null>(null);
   const [showComments, setShowComments] = useState(false);
   const [selectedPostId, setSelectedPostId] = useState<string | null>(null);
-  
+
+  // Página atual do feed, usado para fazer o scroll infinito
+  const [page, setPage] = useState(1);
+
+  // Flag para evitar carregar mais de uma vez ao mesmo tempo
+  const [loadingMore, setLoadingMore] = useState(false);
+
   const auth = useAuth();
-  
 
-  useEffect(() => {
-    const fetchFeedData = async () => {
-      try {
-        const response = await ApiClient.get("/medias/?limit=20", auth);
-        const postsOnly = response.data;
+  const fetchFeedData = async (pageNum = 1) => {
+    try {
+      // Faz a requisicao de posts paginados
+      const response = await ApiClient.get<{ data: PostResponse[] }>(`/medias/?limit=10&page=${pageNum}`, auth);
+      const postsOnly: PostResponse[] = response.data;
 
-        const authorPromises = postsOnly.map((post: PostResponse) =>
-          ApiClient.get(`/users/${post.author._id}`, auth) 
-        );
+      // Busca os dados de cada autor
+      const authorPromises = postsOnly.map((post: PostResponse) =>
+        ApiClient.get<Author>(`/users/${post.author._id}`, auth)
+      );
 
-        const authors = await Promise.all(authorPromises);
-        const combinedData = postsOnly.map((post: PostResponse, index:number) => {
-          return {
-            ...post, 
-            author: authors[index]
-          };
-        });
+      // Espera todas as requisicoes terminarem
+      const authors: Author[] = await Promise.all(authorPromises);
 
-        setData(combinedData);
+      // Combina cada post com seu autor
+      const combinedData: Media[] = postsOnly.map((post, index) => {
+        return {
+          ...post,
+          author: authors[index],
+          isLiked: post.isLiked || false,
+        };
+      });
 
-      } catch (error) {
-        console.error("Erro ao buscar dados do feed:", error);
+      //setData(combinedData);
+      // Atualiza o estado
+    setData((prevData) => {
+      if (pageNum === 1) { // Se a página esta sendo carregada pela primeira vez
+        return combinedData;
+      } else { // Se não só carrega mais posts
+        return [...prevData, ...combinedData]; //...postsAntigos + ...postsNovos
       }
-    };
+    });
 
-    fetchFeedData();
-  }, []);
+    } catch (error) {
+      console.error("Erro ao buscar dados do feed:", error);
+    }
+  };
+
+  // Carrega a primeira página quando o componente monta
+  useEffect(() => {
+    if (auth.isLoaded) {
+      fetchFeedData(1);
+    }
+  }, [auth.isLoaded]);
+
+  const loadMore = async () => {
+  if (loadingMore) {
+    return;
+  } 
+  console.log("Carregando mais posts...");
+  setLoadingMore(true);
+  const nextPage = page + 1;
+  await fetchFeedData(nextPage);
+  setPage(nextPage);
+  setLoadingMore(false);
+  };
+
+  const handleLike = async (postId: string) => {
+    const postOriginal = data.find(p => p._id === postId);
+    if (!postOriginal) return; // caso o post não seja encontrado
+    const seraCurtido = !postOriginal.isLiked;
+
+    try {
+      if (seraCurtido) {
+        await ApiClient.post(`/medias/${postId}/like`, auth, {});
+      } else {
+        await ApiClient.delete(`/medias/${postId}/like`, auth);
+      }
+    } catch (error) {
+      console.error("Erro ao processar o like/unlike:", error);
+      //reverter o estado em caso de erro.
+    }
+
+    setData(currentData =>
+      currentData.map(post => {
+        if (post._id === postId) {
+          const newTotalLikes = seraCurtido ? post.totalLikes + 1 : post.totalLikes - 1;
+          return { ...post, isLiked: seraCurtido, totalLikes: newTotalLikes };
+        }
+        return post;
+      })
+    );
+  };
 
   const selectMedia = (media: Media) => {
     setSelectedMedia(media);
@@ -107,16 +170,21 @@ export default function Home() {
           style={styles.feed}
           data={data}
           keyExtractor={item => item._id.toString()}
+          onEndReached={loadMore} // scroll infinito
+          onEndReachedThreshold={0.5} // scroll infinito
           renderItem={({ item }) => (
             <View style={styles.teste}>
               <Pressable onPress={() => selectMedia(item)}>
                 <FeedCard
+                  id={item._id}
                   description={item.description}
+                  isLiked={!!item.isLiked}
                   url={item.url}
                   createdAt={item.createdAt}
                   totalLikes={item.totalLikes}
                   totalComments={item.totalComments}
                   author={item.author}
+                  onLike={() => handleLike(item._id)}
                   onComment={() => handleOpenComment(item._id)}
                 />
               </Pressable>

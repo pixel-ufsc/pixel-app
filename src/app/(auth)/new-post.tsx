@@ -62,8 +62,8 @@ export default function NewPostScreen() {
       } as any);
     }
 
-    formData.append("upload_preset", "public_upload");
-    const cloudName = "dvs2rufmv";
+    formData.append("upload_preset", process.env.EXPO_PUBLIC_CLOUDINARY_UPLOAD_PRESET!);
+    const cloudName = process.env.EXPO_PUBLIC_CLOUDINARY_CLOUD_NAME!;
 
     try {
       setIsPublishing(true);
@@ -87,7 +87,7 @@ export default function NewPostScreen() {
             description: caption,
             url: data.secure_url,
           },
-          
+
         );
 
         if (data.secure_url) {
