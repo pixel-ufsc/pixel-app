@@ -2,6 +2,7 @@ import { LinearGradient } from "expo-linear-gradient";
 import { Image, Pressable, Text, View } from "react-native";
 import { Modal, Portal } from "react-native-paper";
 import { styles } from "./style";
+import React, { useState } from 'react';
 
 interface Media {
   _id: string;
@@ -23,6 +24,9 @@ interface MediaModalProps {
   media: Media | null;
   onClose: () => void;
   onComment?: () => void;
+  onPressMenu: () => void;
+  menuVisible : boolean;
+  deletePost : (id : string) => void;
 }
 
 export default function MediaModal({
@@ -30,9 +34,12 @@ export default function MediaModal({
   media,
   onClose,
   onComment,
+  onPressMenu,
+  menuVisible,
+  deletePost,
 }: MediaModalProps) {
   if (!media) return null;
-
+  
   return (
     <Portal>
       <Modal
@@ -43,13 +50,40 @@ export default function MediaModal({
           width: "100%",
         }}
       >
-        <View style={{ flex: 1, backgroundColor: "#000" }}>
+        <View style={{ flex: 1, backgroundColor: "#0000009c" }}>
           <Pressable
             onPress={onClose}
             style={{ position: "absolute", padding: 10, zIndex: 9999 }}
           >
             <Image source={require("../../../assets/images/arrow-back.png")} />
           </Pressable>
+
+          <Pressable
+            onPress={onPressMenu}
+            style={{ alignSelf: "end",padding: 12, zIndex: 9999 }}
+          >
+            <Image source={require("../../../assets/images/3lines-icon.png")} />
+          </Pressable>
+          <View
+          style={{ display : menuVisible == true ? "" : "none" , marginTop : 35, zIndex: 9999, 
+            backgroundColor : "white", width : 100 , height : "fit-content" , position : "absolute" , left : "auto" , right : "0%",
+            marginRight: 15 , borderRadius : 5 ,
+          }}
+          >
+            <Pressable
+            style={{
+              position: "absolute",
+              top: 0,
+              right: 0,
+              paddingVertical: 6,
+              paddingHorizontal: 12,
+              borderRadius: 8,
+              backgroundColor: "#f7f1f1ff",
+            }}
+            onPress={() => deletePost(media._id)}
+
+            ><Text style = {{ color: "#693274",fontSize: 16,}}>Deletar</Text></Pressable>
+          </View>
 
           <Image
             style={styles.modalMedia}

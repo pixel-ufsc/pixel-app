@@ -39,13 +39,22 @@ class ApiClient {
     });
   }
 
+  
   public put<T = any>(path: string, auth: Auth, body: any) {
     return this.request<T>(path, auth, {
       method: "PUT",
       body: JSON.stringify(body),
     });
   }
+
+  public delete<T = any>(path: string, auth: Auth) {
+    return this.request<T>(path, auth, {
+      method: "DELETE",
+    });
+  }
 }
+
+
 
 const api = new ApiClient();
 

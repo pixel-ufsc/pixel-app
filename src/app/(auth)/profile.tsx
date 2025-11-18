@@ -48,6 +48,7 @@ export default function Profile() {
   const { getToken, signOut } = useAuth();
   const { id } = useLocalSearchParams();
 
+  
   const [loading, setLoading] = useState(true);
   const [cargo, setCargo] = useState("");
   const [editando, setEditando] = useState(false);
@@ -64,6 +65,7 @@ export default function Profile() {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [selectedPostId, setSelectedPostId] = useState<string>("");
   const [showComments, setShowComments] = useState(false);
+  const [isMenuVisible,setIsMenuVisible] = useState(false);
 
   const postsCount = posts.length;
 
@@ -79,6 +81,17 @@ export default function Profile() {
     logTokenLongo();
   }, [getToken]);
 
+  const handleDeletePost = async (id : string) => {
+    try{
+     await api.delete(`/medias/${id}`, { getToken });
+    } catch (error){
+      console.error("Erro ao deletar usuario :", error);
+    } finally {
+      setEditando(false);
+      setIsModalVisible(false);
+      
+    }
+  }
   const handleUserUpdate = async () => {
     try {
       setLoading(true);
@@ -106,6 +119,10 @@ export default function Profile() {
     setIsModalVisible(true);
   };
 
+  const handleMenu = () => {
+    setIsMenuVisible((editando) => !editando);
+  };
+
   const handleCloseModal = () => {
     setSelectedMedia(null);
     setIsModalVisible(false);
@@ -120,7 +137,7 @@ export default function Profile() {
     setShowComments(false);
     setSelectedPostId("");
   };
-
+  
   useEffect(() => {
     const fetchUser = async () => {
       const uri = id ? id : "me";
@@ -332,6 +349,11 @@ export default function Profile() {
         onClose={handleCloseModal}
         onComment={() => {
           if (selectedMedia) handleOpenComment(selectedMedia._id);
+        }}
+        onPressMenu={handleMenu}
+        menuVisible = {isMenuVisible}
+        deletePost = {() => {
+          if (selectedMedia) handleDeletePost(selectedMedia._id);
         }}
       />
       <CommentModal
