@@ -1,4 +1,6 @@
 import { tokenCache } from "@/storage/tokenCache";
+import api from "@/utils/api";
+import { getPushToken } from "@/utils/getPushToken";
 import { ClerkProvider, useAuth } from "@clerk/clerk-expo";
 import Constants from "expo-constants";
 import { router, Slot, usePathname } from "expo-router";
@@ -11,14 +13,29 @@ const PUBLIC_CLERK_PUBLISHABLE_KEY =
   (Constants.expoConfig?.extra?.EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY as string);
 
 function InitialLayout() {
-  const { isSignedIn, isLoaded } = useAuth();
+  const { isSignedIn, isLoaded, getToken } = useAuth();
   const pathname = usePathname();
 
   useEffect(() => {
+    const registerPushToken = async () => {
+      try {
+        const { _id } = await api.get("/users/me", { getToken });
+        const pushToken = await getPushToken();
+        console.log(pushToken);
+        await api.put(`/users/pushToken/${_id}`, { getToken }, { pushToken });
+      } catch (error) {
+        console.error(
+          "erro ao adicionar token de notificação do usuário",
+          error,
+        );
+      }
+    };
+
     if (!isLoaded) return;
     // Só redireciona se estiver na raiz
     if (pathname === "/") {
       if (isSignedIn) {
+        registerPushToken();
         router.replace("./(auth)");
       } else {
         router.replace("./(public)");
