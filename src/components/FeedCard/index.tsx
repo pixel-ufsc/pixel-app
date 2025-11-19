@@ -89,18 +89,6 @@ const FeedCard: React.FC<FeedCardProps> = ({ id, isLiked, description, url, crea
               <Text style={styles.footerActionText}>Comentar</Text>
             </View>
           </Pressable>
-          <Pressable
-            onPress={() => console.log("Compartilhamento")}
-            style={styles.footerActionContainer}
-          >
-            <Image
-              style={styles.footerIcon}
-              source={require("../../../assets/images/send-icon.png")}
-            />
-            <View>
-              <Text style={styles.footerActionText}>Enviar</Text>
-            </View>
-          </Pressable>
         </View>
       </View>
     </View>
