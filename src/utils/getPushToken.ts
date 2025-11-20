@@ -1,13 +1,18 @@
-import messaging from "@react-native-firebase/messaging";
+import messaging, {
+  AuthorizationStatus,
+  getToken,
+  requestPermission,
+} from "@react-native-firebase/messaging";
 
 export async function getPushToken() {
-  const authStatus = await messaging().requestPermission();
+  const messagingInstance = messaging();
+  const authStatus = await requestPermission(messagingInstance);
   const enabled =
-    authStatus === messaging.AuthorizationStatus.AUTHORIZED ||
-    authStatus === messaging.AuthorizationStatus.PROVISIONAL;
+    authStatus === AuthorizationStatus.AUTHORIZED ||
+    authStatus === AuthorizationStatus.PROVISIONAL;
 
   if (!enabled) return null;
 
-  const token = await messaging().getToken();
+  const token = await getToken(messagingInstance);
   return token;
 }
