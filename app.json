@@ -34,7 +34,8 @@
       "expo-secure-store",
       "@react-native-firebase/app",
       "@react-native-firebase/messaging",
-      "expo-build-properties"
+      "expo-build-properties",
+      "expo-notifications"
     ],
     "experiments": {
       "typedRoutes": true
@@ -45,9 +46,7 @@
       },
       "eas": {
         "projectId": "fc729949-ad57-4edd-aec2-214eaa74013e"
-      },
-      "EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY": "pk_test_Y2hhcm1pbmcta2l3aS0wLmNsZXJrLmFjY291bnRzLmRldiQ",
-      "API_BASE_URI": "http://10.0.2.2:3040"
+      }
     }
   }
 }
