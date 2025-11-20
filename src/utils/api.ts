@@ -1,14 +1,19 @@
-import Constants from "expo-constants";
+import { Platform } from "react-native";
 
 interface Auth {
   getToken: () => Promise<string | null>;
 }
 
 class ApiClient {
-  private baseUrl: string =
-    process.env.API_BASE_URI ||
-    Constants.expoConfig?.extra?.API_BASE_URI ||
-    "http://localhost:3040";
+  constructor() {
+    if (Platform.OS === "web") {
+      this.baseUrl = process.env.API_BASE_URI || "http://localhost:3040";
+    } else {
+      this.baseUrl = process.env.API_NATIVE_URI || "http://10.0.2.2:3040";
+    }
+  }
+
+  private baseUrl: string;
 
   private async request<T = any>(
     path: string,
