@@ -1,25 +1,44 @@
-import { router, Slot, usePathname } from 'expo-router';
-import { ClerkProvider, useAuth } from '@clerk/clerk-expo';
-import { useEffect } from 'react';
-import { ActivityIndicator } from 'react-native';
-import { tokenCache } from '@/storage/tokenCache';
-import { DefaultTheme, PaperProvider } from 'react-native-paper';
+import { tokenCache } from "@/storage/tokenCache";
+import api from "@/utils/api";
+import { getPushToken } from "@/utils/getPushToken";
+import useFCMSetup from "@/utils/useFCMSetup";
+import { ClerkProvider, useAuth } from "@clerk/clerk-expo";
+import { router, Slot, usePathname } from "expo-router";
+import { useEffect } from "react";
+import { ActivityIndicator, Platform } from "react-native";
+import { DefaultTheme, PaperProvider } from "react-native-paper";
 
 const PUBLIC_CLERK_PUBLISHABLE_KEY = process.env
   .EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY as string;
 
 function InitialLayout() {
-  const { isSignedIn, isLoaded } = useAuth();
+  const { isSignedIn, isLoaded, getToken } = useAuth();
   const pathname = usePathname();
 
+  if (Platform.OS !== "web") useFCMSetup();
+
   useEffect(() => {
+    const registerPushToken = async () => {
+      try {
+        const { _id } = await api.get("/users/me", { getToken });
+        const pushToken = await getPushToken();
+        await api.put(`/users/pushToken/${_id}`, { getToken }, { pushToken });
+      } catch (error) {
+        console.error(
+          "erro ao adicionar token de notificação do usuário",
+          error,
+        );
+      }
+    };
+
     if (!isLoaded) return;
     // Só redireciona se estiver na raiz
-    if (pathname === '/') {
+    if (pathname === "/") {
       if (isSignedIn) {
-        router.replace('./(auth)');
+        if (Platform.OS !== "web") registerPushToken();
+        router.replace("./(auth)");
       } else {
-        router.replace('./(public)');
+        router.replace("./(public)");
       }
     }
   }, [isSignedIn, isLoaded, pathname]);
@@ -28,7 +47,7 @@ function InitialLayout() {
     <Slot />
   ) : (
     <ActivityIndicator
-      style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}
+      style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
     />
   );
 }
@@ -37,7 +56,7 @@ const theme = {
   ...DefaultTheme,
   colors: {
     ...DefaultTheme.colors,
-    primary: '#6200ee',
+    primary: "#6200ee",
   },
 };
 

@@ -10,10 +10,10 @@ interface FeedCardProps {
   url: string;
   createdAt: Date;
   author: {
-    first_name: string,
-    last_name: string,
-    role: string,
-    profileImageUrl: string,
+    first_name: string;
+    last_name: string;
+    role: string;
+    profileImageUrl: string;
   };
   totalLikes: number;
   totalComments: number;
@@ -21,14 +21,29 @@ interface FeedCardProps {
   onLike: () => void;
 }
 
-const FeedCard: React.FC<FeedCardProps> = ({ id, isLiked, description, url, createdAt, totalLikes, totalComments, author, onLike, onComment }) => {
+const FeedCard: React.FC<FeedCardProps> = ({
+  id,
+  isLiked,
+  description,
+  url,
+  createdAt,
+  totalLikes,
+  totalComments,
+  author,
+  onLike,
+  onComment,
+}) => {
   const mediaDate = new Date(createdAt);
   const currentDate = new Date();
   let date;
 
   /** @TODO futuramente não precisaremos desse valor default de 3d */
   if (createdAt) {
-    date = formatDate(mediaDate, currentDate);
+    try {
+      date = formatDate(mediaDate, currentDate);
+    } catch (err) {
+      date = "3d";
+    }
   } else {
     date = "3d";
   }
@@ -40,13 +55,17 @@ const FeedCard: React.FC<FeedCardProps> = ({ id, isLiked, description, url, crea
           <View style={styles.userThumbnail}>
             <Image
               style={styles.userImage}
-              source={author.profileImageUrl
-                ? { uri: author.profileImageUrl }
-                : require('../../../assets/images/register-user-logo.png')}
+              source={
+                author.profileImageUrl
+                  ? { uri: author.profileImageUrl }
+                  : require("../../../assets/images/register-user-logo.png")
+              }
             />
           </View>
           <View style={styles.headerDescription}>
-            <Text style={styles.userName}>{author.first_name} {author.last_name}</Text>
+            <Text style={styles.userName}>
+              {author.first_name} {author.last_name}
+            </Text>
             <Text style={styles.userRole}>{author.role}</Text>
             <Text style={styles.date}>{date}</Text>
           </View>
@@ -71,10 +90,21 @@ const FeedCard: React.FC<FeedCardProps> = ({ id, isLiked, description, url, crea
           >
             <Image
               style={styles.footerIcon}
-              source={isLiked ? require("../../../assets/images/thumb_up_full-icon.png") : require("../../../assets/images/thumb_up-icon.png")}
+              source={
+                isLiked
+                  ? require("../../../assets/images/thumb_up_full-icon.png")
+                  : require("../../../assets/images/thumb_up-icon.png")
+              }
             />
             <View>
-              <Text style={[styles.footerActionText, { color: isLiked ? '#490471ff' : '#000000b3' }]}>Gostei</Text>
+              <Text
+                style={[
+                  styles.footerActionText,
+                  { color: isLiked ? "#490471ff" : "#000000b3" },
+                ]}
+              >
+                Gostei
+              </Text>
             </View>
           </Pressable>
           <Pressable
