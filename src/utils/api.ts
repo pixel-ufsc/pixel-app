@@ -52,6 +52,7 @@ class ApiClient {
     });
   }
 
+  
   public put<T = any>(path: string, auth: Auth, body: any) {
     return this.request<T>(path, auth, {
       method: "PUT",
@@ -63,6 +64,8 @@ class ApiClient {
     return this.request<T>(path, auth, { method: "DELETE" });
   }
 }
+
+
 
 const api = new ApiClient();
 
