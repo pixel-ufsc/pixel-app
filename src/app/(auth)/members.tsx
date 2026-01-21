@@ -18,7 +18,7 @@ interface Member {
   email: string;
   role: string;
   memberSince: string;
-  image: string;
+  profileImageUrl?: string;
 }
 
 interface ApiResponse {
@@ -52,9 +52,7 @@ export default function Members() {
         email: user.email,
         role: user.role || "Membro",
         memberSince: user.memberSince || "2024/2",
-        image:
-          user.image ||
-          "https://images.unsplash.com/photo-1511367461989-f85a21fda167",
+        profileImageUrl: user.profileImageUrl,
       }));
 
       setMembers(formattedMembers);
@@ -115,7 +113,7 @@ export default function Members() {
           <CardMembro
             id={item._id}
             nome={`${item.first_name} ${item.last_name}`}
-            imagem={item.image}
+            imagem={item.profileImageUrl || require("../../../assets/images/register-user-logo.png")}
             membroDesde={item.memberSince}
             role={item.role}
           />

@@ -1,7 +1,9 @@
 import { useAuth } from "@clerk/clerk-expo";
 import AntDesign from '@expo/vector-icons/AntDesign';
 import { Picker } from "@react-native-picker/picker";
+import * as ImagePicker from "expo-image-picker";
 import React, { useState } from "react";
+import { uploadImageToCloudinary } from "@/utils/cloudinary";
 import {
   Dimensions,
   Image,
@@ -30,6 +32,7 @@ function RegisterPage(){
     const [role, setRole] = useState(""); 
     const { getToken, isLoaded, userId } = useAuth();
     const [selectedOption, setSelectedOption] = useState<string>(""); //picker
+    const [isUploadingImage, setIsUploadingImage] = useState(false);
     const windowHeight = Dimensions.get('window').height * 0.08;
 
     function handleName(e : NativeSyntheticEvent<TextInputChangeEventData>){
@@ -78,12 +81,29 @@ function RegisterPage(){
   try {
      const token = await getToken();
 
+     let profileImageUrlToSave = fotoUrl;
+
+     // Se há uma foto selecionada e é uma URI local, fazer upload para Cloudinary
+     if (fotoUrl && (fotoUrl.startsWith("file://") || fotoUrl.startsWith("content://") || fotoUrl.startsWith("ph://"))) {
+       setIsUploadingImage(true);
+       try {
+         profileImageUrlToSave = await uploadImageToCloudinary(fotoUrl);
+       } catch (error) {
+         console.error("Erro ao fazer upload da imagem:", error);
+         alert("Erro ao fazer upload da imagem. Tente novamente.");
+         setIsUploadingImage(false);
+         return;
+       } finally {
+         setIsUploadingImage(false);
+       }
+     }
+
     const userData = {
       first_name : firstName,
       last_name : lastName, 
       email : email, 
       bio : bio, 
-      profileImageUrl : fotoUrl, 
+      profileImageUrl : profileImageUrlToSave, 
       role : role, 
       memberSince : memberSince,
     }

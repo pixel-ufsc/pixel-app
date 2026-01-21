@@ -9,13 +9,14 @@ interface Media {
   description: string;
   url: string;
   createdAt: Date;
-  totalLikes:number;
-  totalComments: number;
-  author : {
-    first_name: string,
-    last_name: string,     
-    role: string,
-    profileImageUrl: string,
+  totalLikes?: number;
+  totalComments?: number;
+  author?: {
+    _id?: string;
+    first_name?: string,
+    last_name?: string,     
+    role?: string,
+    profileImageUrl?: string,
   };
 }
 
@@ -24,9 +25,10 @@ interface MediaModalProps {
   media: Media | null;
   onClose: () => void;
   onComment?: () => void;
-  onPressMenu: () => void;
-  menuVisible : boolean;
-  deletePost : (id : string) => void;
+  onPressMenu?: () => void;
+  menuVisible?: boolean;
+  deletePost?: (id: string) => void;
+  currentUserId?: string; // ID do usuário logado
 }
 
 export default function MediaModal({
@@ -35,10 +37,14 @@ export default function MediaModal({
   onClose,
   onComment,
   onPressMenu,
-  menuVisible,
+  menuVisible = false,
   deletePost,
+  currentUserId,
 }: MediaModalProps) {
   if (!media) return null;
+  
+  // Verificar se o post pertence ao usuário logado
+  const isOwnPost = currentUserId && media.author && media.author._id === currentUserId;
   
   return (
     <Portal>
@@ -58,32 +64,49 @@ export default function MediaModal({
             <Image source={require("../../../assets/images/arrow-back.png")} />
           </Pressable>
 
-          <Pressable
-            onPress={onPressMenu}
-            style={{ alignSelf: "end",padding: 12, zIndex: 9999 }}
-          >
-            <Image source={require("../../../assets/images/3lines-icon.png")} />
-          </Pressable>
-          <View
-          style={{ display : menuVisible == true ? "" : "none" , marginTop : 35, zIndex: 9999, 
-            backgroundColor : "white", width : 100 , height : "fit-content" , position : "absolute" , left : "auto" , right : "0%",
-            marginRight: 15 , borderRadius : 5 ,
-          }}
-          >
-            <Pressable
-            style={{
-              position: "absolute",
-              top: 0,
-              right: 0,
-              paddingVertical: 6,
-              paddingHorizontal: 12,
-              borderRadius: 8,
-              backgroundColor: "#f7f1f1ff",
-            }}
-            onPress={() => deletePost(media._id)}
-
-            ><Text style = {{ color: "#693274",fontSize: 16,}}>Deletar</Text></Pressable>
-          </View>
+          {/* Só mostrar o ícone de 3 barras se for o dono do post */}
+          {isOwnPost && onPressMenu && (
+            <>
+              <Pressable
+                onPress={onPressMenu}
+                style={{ alignSelf: "end", padding: 12, zIndex: 9999 }}
+              >
+                <Image source={require("../../../assets/images/3lines-icon.png")} />
+              </Pressable>
+              {menuVisible && deletePost && (
+                <View
+                  style={{
+                    display: menuVisible ? "flex" : "none",
+                    marginTop: 35,
+                    zIndex: 9999,
+                    backgroundColor: "white",
+                    width: 100,
+                    height: "fit-content",
+                    position: "absolute",
+                    left: "auto",
+                    right: "0%",
+                    marginRight: 15,
+                    borderRadius: 5,
+                  }}
+                >
+                  <Pressable
+                    style={{
+                      position: "absolute",
+                      top: 0,
+                      right: 0,
+                      paddingVertical: 6,
+                      paddingHorizontal: 12,
+                      borderRadius: 8,
+                      backgroundColor: "#f7f1f1ff",
+                    }}
+                    onPress={() => deletePost(media._id)}
+                  >
+                    <Text style={{ color: "#693274", fontSize: 16 }}>Deletar</Text>
+                  </Pressable>
+                </View>
+              )}
+            </>
+          )}
 
           <Image
             style={styles.modalMedia}
@@ -114,8 +137,8 @@ export default function MediaModal({
             >
               <View style={styles.userImage}></View>
               <View>
-                <Text style={styles.userName}>{media.author.first_name} {media.author.last_name}</Text>
-                <Text style={styles.userRole}>{media.author.role}</Text>
+                <Text style={styles.userName}>{media.author.first_name || ""} {media.author.last_name || ""}</Text>
+                <Text style={styles.userRole}>{media.author.role || ""}</Text>
               </View>
             </View>
             <Text style={styles.mediaDescription}>{media.description}</Text>
@@ -130,7 +153,7 @@ export default function MediaModal({
                 style={styles.footerIcon}
                 source={require("../../../assets/images/thumb_up-white.png")}
               />
-              <Text style={styles.footerActionText}>{media.totalLikes}</Text>
+              <Text style={styles.footerActionText}>{media.totalLikes || 0}</Text>
             </Pressable>
             <Pressable
               onPress={onComment}
@@ -140,7 +163,7 @@ export default function MediaModal({
                 style={styles.footerIcon}
                 source={require("../../../assets/images/comment-white.png")}
               />
-              <Text style={styles.footerActionText}>{media.totalComments}</Text>
+              <Text style={styles.footerActionText}>{media.totalComments || 0}</Text>
             </Pressable>
           </View>
         </View>
