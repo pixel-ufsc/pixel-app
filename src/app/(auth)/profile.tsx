@@ -1,6 +1,7 @@
 import CommentModal from "@/components/CommentModal";
 import MediaModal from "@/components/MediaModal";
 import api from "@/utils/api";
+import { uploadImageToCloudinary } from "@/utils/cloudinary";
 import { useAuth } from "@clerk/clerk-expo";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import * as ImagePicker from "expo-image-picker";
@@ -37,6 +38,15 @@ interface Media {
   description: string;
   url: string;
   createdAt: Date;
+  totalLikes?: number;
+  totalComments?: number;
+  author?: {
+    _id?: string;
+    first_name?: string;
+    last_name?: string;
+    role?: string;
+    profileImageUrl?: string;
+  };
 }
 
 interface MediaResponse {
@@ -65,7 +75,9 @@ export default function Profile() {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [selectedPostId, setSelectedPostId] = useState<string>("");
   const [showComments, setShowComments] = useState(false);
-  const [isMenuVisible,setIsMenuVisible] = useState(false);
+  const [isMenuVisible, setIsMenuVisible] = useState(false);
+  const [currentUserId, setCurrentUserId] = useState<string | undefined>(undefined);
+  const [isUploadingImage, setIsUploadingImage] = useState(false);
 
   const postsCount = posts.length;
 
@@ -80,28 +92,79 @@ export default function Profile() {
     logTokenLongo();
   }, [getToken]);
 
-  const handleDeletePost = async (id : string) => {
-    try{
-     await api.delete(`/medias/${id}`, { getToken });
-    } catch (error){
-      console.error("Erro ao deletar usuario :", error);
-    } finally {
-      setEditando(false);
+  const handleDeletePost = async (id: string) => {
+    try {
+      await api.delete(`/medias/${id}`, { getToken });
+      // Remover o post da lista
+      setPosts((prevPosts) => prevPosts.filter((post) => post._id !== id));
       setIsModalVisible(false);
-      
+      setIsMenuVisible(false);
+    } catch (error) {
+      console.error("Erro ao deletar post:", error);
     }
-  }
+  };
   const handleUserUpdate = async () => {
     try {
       setLoading(true);
       if (userData == null) throw TypeError;
+
+      let profileImageUrlToSave = fotoUrl;
+
+      // Verificar se a foto precisa ser enviada para Cloudinary
+      // Se não é uma URL do Cloudinary e não é vazia, fazer upload
+      const isCloudinaryUrl = fotoUrl && fotoUrl.includes("res.cloudinary.com");
+      const isLocalUri = fotoUrl && (
+        fotoUrl.startsWith("file://") || 
+        fotoUrl.startsWith("content://") || 
+        fotoUrl.startsWith("ph://") ||
+        fotoUrl.startsWith("assets-library://")
+      );
+
+      if (fotoUrl && !isCloudinaryUrl && isLocalUri) {
+        setIsUploadingImage(true);
+        try {
+          console.log("Fazendo upload da imagem para Cloudinary...");
+          profileImageUrlToSave = await uploadImageToCloudinary(fotoUrl);
+          console.log("Upload concluído:", profileImageUrlToSave);
+          setFotoUrl(profileImageUrlToSave); // Atualizar o estado com a URL do Cloudinary
+        } catch (error) {
+          console.error("Erro ao fazer upload da imagem:", error);
+          alert("Erro ao fazer upload da imagem. Tente novamente.");
+          setIsUploadingImage(false);
+          setLoading(false);
+          return;
+        } finally {
+          setIsUploadingImage(false);
+        }
+      }
+
+      // Garantir que não estamos enviando URI local
+      if (profileImageUrlToSave && (
+        profileImageUrlToSave.startsWith("file://") || 
+        profileImageUrlToSave.startsWith("content://") || 
+        profileImageUrlToSave.startsWith("ph://") ||
+        profileImageUrlToSave.startsWith("assets-library://")
+      )) {
+        console.error("Tentativa de enviar URI local bloqueada:", profileImageUrlToSave);
+        alert("Erro: A imagem não foi enviada corretamente. Tente novamente.");
+        setLoading(false);
+        return;
+      }
+
+      console.log("Enviando dados para o backend:", {
+        first_name: firstName,
+        last_name: lastName,
+        profileImageUrl: profileImageUrlToSave?.substring(0, 50) + "...", // Log apenas início da URL
+        bio: bio,
+      });
+
       await api.put(
         `/users/${userData._id}`,
         { getToken },
         {
           first_name: firstName,
           last_name: lastName,
-          profileImageUrl: fotoUrl,
+          profileImageUrl: profileImageUrlToSave,
           bio: bio,
         },
       );
@@ -163,19 +226,39 @@ export default function Profile() {
               getToken,
             },
           );
-          setPosts(userPosts.data);
+          // Adicionar informações do autor aos posts
+          const postsWithAuthor = userPosts.data.map((post) => ({
+            ...post,
+            author: {
+              _id: userData._id,
+              first_name: userData.first_name,
+              last_name: userData.last_name,
+              role: userData.role,
+              profileImageUrl: userData.profileImageUrl,
+            },
+          }));
+          setPosts(postsWithAuthor);
         } catch (error) {
           console.error("Erro ao pedir mídias do usuário:", error);
         }
       };
 
       const checkOwnProfile = async () => {
-        // Checa se o perfil é o mesmo do usuário autenticado quando o perfil é acessado na página de membros
-        if (id) {
+        // Sempre buscar o usuário logado para comparar
+        try {
           const ownUserResponse = await api.get<User>("/users/me", {
             getToken,
           });
-          setIsOwnProfile(userData._id === ownUserResponse._id);
+          setCurrentUserId(ownUserResponse._id);
+          // Checa se o perfil é o mesmo do usuário autenticado quando o perfil é acessado na página de membros
+          if (id) {
+            setIsOwnProfile(userData._id === ownUserResponse._id);
+          } else {
+            // Se não tem id, é o próprio perfil
+            setIsOwnProfile(true);
+          }
+        } catch (error) {
+          console.error("Erro ao buscar usuário atual:", error);
         }
       };
 
@@ -230,8 +313,11 @@ export default function Profile() {
             <TouchableOpacity
               style={styles.changePhotoButton}
               onPress={pickImage}
+              disabled={isUploadingImage}
             >
-              <Text style={styles.changePhotoButtonText}>Alterar foto</Text>
+              <Text style={styles.changePhotoButtonText}>
+                {isUploadingImage ? "Enviando..." : "Alterar foto"}
+              </Text>
             </TouchableOpacity>
           )}
         </View>
@@ -348,10 +434,9 @@ export default function Profile() {
           if (selectedMedia) handleOpenComment(selectedMedia._id);
         }}
         onPressMenu={handleMenu}
-        menuVisible = {isMenuVisible}
-        deletePost = {() => {
-          if (selectedMedia) handleDeletePost(selectedMedia._id);
-        }}
+        menuVisible={isMenuVisible}
+        deletePost={handleDeletePost}
+        currentUserId={currentUserId}
       />
       <CommentModal
         visible={showComments}

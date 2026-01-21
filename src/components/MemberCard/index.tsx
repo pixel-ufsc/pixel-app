@@ -5,7 +5,7 @@ import { styles } from "./style";
 type CardMembroProps = {
   id: string;
   nome: string;
-  imagem: string;
+  imagem: string | number; // Pode ser URI (string) ou require (number)
   membroDesde: string;
   role: string;
 };
@@ -27,7 +27,7 @@ export default function CardMembro({
       onPress={handlePress}
     >
       <Image
-        source={{ uri: imagem }}
+        source={typeof imagem === "string" ? { uri: imagem } : imagem}
         style={styles.image}
       />
       <View style={styles.infoContainer}>

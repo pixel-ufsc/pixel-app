@@ -4,7 +4,7 @@ import MediaModal from "@/components/MediaModal";
 import ApiClient from "@/utils/api";
 import { useAuth } from "@clerk/clerk-expo";
 import { useEffect, useState } from "react";
-import { FlatList, Pressable, StyleSheet, View } from "react-native";
+import { ActivityIndicator, FlatList, Pressable, StyleSheet, View } from "react-native";
 
 interface Author {
   _id: string;
@@ -38,12 +38,19 @@ interface Media {
   author: Author;
 }
 
+interface CurrentUser {
+  _id: string;
+}
+
 export default function Home() {
   const [data, setData] = useState<Media[]>([]);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [selectedMedia, setSelectedMedia] = useState<Media | null>(null);
   const [showComments, setShowComments] = useState(false);
   const [selectedPostId, setSelectedPostId] = useState<string | null>(null);
+  const [currentUserId, setCurrentUserId] = useState<string | undefined>(undefined);
+  const [isMenuVisible, setIsMenuVisible] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   // Página atual do feed, usado para fazer o scroll infinito
   const [page, setPage] = useState(1);
@@ -55,6 +62,11 @@ export default function Home() {
 
   const fetchFeedData = async (pageNum = 1) => {
     try {
+      // Se for a primeira página, mostrar loading
+      if (pageNum === 1) {
+        setLoading(true);
+      }
+
       // Faz a requisicao de posts paginados
       const response = await ApiClient.get<{ data: PostResponse[] }>(`/medias/?limit=10&page=${pageNum}`, auth);
       const postsOnly: PostResponse[] = response.data;
@@ -88,8 +100,28 @@ export default function Home() {
 
     } catch (error) {
       console.error("Erro ao buscar dados do feed:", error);
+    } finally {
+      // Se for a primeira página, esconder loading
+      if (pageNum === 1) {
+        setLoading(false);
+      }
     }
   };
+
+  // Buscar o ID do usuário logado
+  useEffect(() => {
+    const fetchCurrentUser = async () => {
+      if (auth.isLoaded) {
+        try {
+          const user = await ApiClient.get<CurrentUser>("/users/me", auth);
+          setCurrentUserId(user._id);
+        } catch (error) {
+          console.error("Erro ao buscar usuário atual:", error);
+        }
+      }
+    };
+    fetchCurrentUser();
+  }, [auth.isLoaded]);
 
   // Carrega a primeira página quando o componente monta
   useEffect(() => {
@@ -144,6 +176,23 @@ export default function Home() {
   const closemodal = () => {
     setSelectedMedia(null);
     setIsModalVisible(false);
+    setIsMenuVisible(false);
+  };
+
+  const handleMenu = () => {
+    setIsMenuVisible((prev) => !prev);
+  };
+
+  const handleDeletePost = async (id: string) => {
+    try {
+      await ApiClient.delete(`/medias/${id}`, auth);
+      // Remover o post da lista
+      setData((prevData) => prevData.filter((post) => post._id !== id));
+      setIsModalVisible(false);
+      setIsMenuVisible(false);
+    } catch (error) {
+      console.error("Erro ao deletar post:", error);
+    }
   };
 
   const handleOpenComment = (postId: string) => {
@@ -158,6 +207,17 @@ export default function Home() {
 
   useEffect(() => {
   }, [selectedMedia, isModalVisible]);
+
+  if (loading && data.length === 0) {
+    return (
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator
+          size="large"
+          color="#693274"
+        />
+      </View>
+    );
+  }
 
   return (
     <>
@@ -195,6 +255,10 @@ export default function Home() {
         onComment={() => {
           if (selectedMedia) handleOpenComment(selectedMedia._id);
         }}
+        onPressMenu={handleMenu}
+        menuVisible={isMenuVisible}
+        deletePost={handleDeletePost}
+        currentUserId={currentUserId}
       />
       <CommentModal
         visible={showComments}
@@ -213,6 +277,12 @@ const styles = StyleSheet.create({
     alignItems: "center",
     backgroundColor: "#e9e5df",
     gap: 12,
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "#e9e5df",
   },
   text: {
     fontSize: 20,

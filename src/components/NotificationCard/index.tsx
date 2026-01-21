@@ -8,7 +8,7 @@ type NotificationCardProps = {
   nome: string;
   acao: string;
   tempo: string;
-  imagem: string;
+  imagem: string | number; // Pode ser URI (string) ou require (number)
   onOpenPost: (postId: string) => void;
 };
 
@@ -30,7 +30,7 @@ export default function NotificationCard({
   return (
     <View style={styles.card} >
       <TouchableOpacity onPress={handlePressImage}>
-        <Image source={{ uri: imagem }} style={styles.image} />
+        <Image source={typeof imagem === "string" ? { uri: imagem } : imagem} style={styles.image} />
       </TouchableOpacity>
       <TouchableOpacity style={{ flex: 1 }} onPress={() => onOpenPost(postId)}>
         <Text style={{ fontSize: 16 }}>
